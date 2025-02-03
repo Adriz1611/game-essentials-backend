@@ -30,8 +30,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { addCategory } from "@/app/actions/product-action";
 
-// This is a mock data structure. In a real application, you'd fetch this from an API.
 const mockCategories = [
   {
     id: 1,
@@ -64,23 +64,17 @@ export default function AddCategoryForm() {
     },
   });
 
-  function onSubmit(values) {
-    // Here you would typically send the data to your backend
-    console.log(values);
+  const onSubmit = async (values) => {
+    const result = await addCategory(values);
+    if (result.success) {
+      form.reset();
+      alert("Category added successfully!");
+    } else {
+      alert(result.error?.message);
+    }
 
-    // For demonstration, we'll add the new category to our local state
-    const newCategory = {
-      id: categories.length + 1,
-      name: values.name,
-      description: values.description,
-    };
-    setCategories([...categories, newCategory]);
-
-    // Reset the form
-    form.reset();
-
-    alert("Category added successfully!");
-  }
+    
+  };
 
   return (
     <Card>

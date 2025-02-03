@@ -1,0 +1,37 @@
+"use server";
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from 'next/cache'
+export const addCategory = async (formData) => {
+
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from("categories")
+      .insert([
+        {
+          name: formData.name,
+          description: formData.description,
+          parent_id:
+            formData.parent_category_id === undefined
+              ? null
+              : formData.parent_category_id,
+        },
+      ])
+      .select();
+    console.log({ data, error });
+
+    if (error) {
+      return {
+        error: {
+          message: "Database error: " + error.message,
+        },
+        success: false,
+      };
+    }
+
+    revalidatePath("/categories");
+
+    return {
+      data,
+      success: true,
+    };
+};
