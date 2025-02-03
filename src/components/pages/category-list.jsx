@@ -13,17 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 
-// This is a mock data structure. In a real application, you'd fetch this from an API.
-const mockCategories = [
-  { id: 1, name: "Electronics", description: "Electronic devices and accessories", parent_category_id: null },
-  { id: 2, name: "Books", description: "Physical and digital books", parent_category_id: null },
-  { id: 3, name: "Clothing", description: "Apparel and accessories", parent_category_id: null },
-  { id: 4, name: "Smartphones", description: "Mobile phones and accessories", parent_category_id: 1 },
-  { id: 5, name: "Laptops", description: "Portable computers", parent_category_id: 1 },
-]
 
-export default function CategoryList() {
-  const [categories, setCategories] = useState(mockCategories)
+export default function CategoryList({ data }) {
+  const [categories, setCategories] = useState(data)
   const [sortConfig, setSortConfig] = useState(null)
 
   const sortCategories = (key) => {
@@ -57,7 +49,7 @@ export default function CategoryList() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
+            <TableHead className="w-[300px]">ID</TableHead>
             <TableHead>
               <Button variant="ghost" onClick={() => sortCategories("name")}>
                 Name <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -74,7 +66,7 @@ export default function CategoryList() {
               <TableCell className="font-medium">{category.id}</TableCell>
               <TableCell>{category.name}</TableCell>
               <TableCell>{category.description}</TableCell>
-              <TableCell>{getParentCategoryName(category.parent_category_id)}</TableCell>
+              <TableCell>{getParentCategoryName(category.parent_id)}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

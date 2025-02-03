@@ -32,15 +32,6 @@ import {
 } from "@/components/ui/card";
 import { addCategory } from "@/app/actions/product-action";
 
-const mockCategories = [
-  {
-    id: 1,
-    name: "Electronics",
-    description: "Electronic devices and accessories",
-  },
-  { id: 2, name: "Books", description: "Physical and digital books" },
-  { id: 3, name: "Clothing", description: "Apparel and accessories" },
-];
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -52,8 +43,8 @@ const formSchema = z.object({
   parent_category_id: z.string().optional(),
 });
 
-export default function AddCategoryForm() {
-  const [categories, setCategories] = useState(mockCategories);
+export default function AddCategoryForm({ data }) {
+  const [categories, setCategories] = useState(data);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
