@@ -1,5 +1,6 @@
 import ProductList from "@/components/pages/list-product";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
 
@@ -15,4 +16,20 @@ export default function ProductsPage() {
         <ProductList />
     </div>
   )
+}
+
+async function fetchProducts() {
+const supabase = await createClient()
+const { data: products, error } = await supabase
+  .from("products")
+  .select("*, categories ( name )");
+
+if (error) {
+  console.error("Error fetching products:", error);
+  return [];
+}
+
+return products;
+
+  
 }

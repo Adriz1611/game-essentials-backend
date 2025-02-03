@@ -1,5 +1,8 @@
 "use client";
 import { useForm, useFieldArray } from "react-hook-form";
+import { useState, useCallback } from "react";
+import { X } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -30,13 +33,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { addProduct } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
+  description: z.string().min(4, {
+    message: "Description must be at least 4 characters.",
   }),
   price: z.number().positive({
     message: "Price must be a positive number.",
@@ -60,7 +64,9 @@ const formSchema = z.object({
   isDigital: z.boolean(),
 });
 
-export default function AddProductForm() {
+export default function AddProductForm({ data }) {
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [categories, setCategories] = useState(data);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,11 +87,30 @@ export default function AddProductForm() {
     name: "specifications",
   });
 
-  function onSubmit(values) {
-    console.log(values);
+  const onDrop = useCallback((acceptedFiles) => {
+    setUploadedImages((prevImages) => [...prevImages, ...acceptedFiles]);
+  }, []);
 
-    alert("Product added successfully!");
-    form.reset();
+  const removeImage = (index) => {
+    setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+    },
+    multiple: true,
+  });
+
+  async function onSubmit(values) {
+    const res = await addProduct(values);
+    if (!res.success) {
+      alert(res.error?.message);
+    } else {
+      alert("Product added successfully!");
+      form.reset();
+    }
   }
 
   return (
@@ -143,8 +168,9 @@ export default function AddProductForm() {
                         placeholder="0.00"
                         {...field}
                         onChange={(e) =>
-                          field.onChange(Number.parseFloat(e.target.value))
+                          field.onChange(e.target.value === "" ? "" : Number.parseFloat(e.target.value))
                         }
+                        value={field.value === 0 ? "" : field.value}
                       />
                     </FormControl>
                     <FormMessage />
@@ -168,9 +194,8 @@ export default function AddProductForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="INR">INR</SelectItem>
                         <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="EUR">EUR</SelectItem>
-                        <SelectItem value="GBP">GBP</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -191,8 +216,9 @@ export default function AddProductForm() {
                       placeholder="0"
                       {...field}
                       onChange={(e) =>
-                        field.onChange(Number.parseInt(e.target.value))
+                        field.onChange(e.target.value === "" ? 0 : Number.parseInt(e.target.value))
                       }
+                      value={field.value === 0 ? "" : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -216,9 +242,14 @@ export default function AddProductForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="electronics">Electronics</SelectItem>
-                      <SelectItem value="clothing">Clothing</SelectItem>
-                      <SelectItem value="books">Books</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -300,6 +331,42 @@ export default function AddProductForm() {
                   </FormItem>
                 )}
               />
+            </div>
+            <div>
+              <Label>Product Images</Label>
+              <div
+                {...getRootProps()}
+                className="border-2 border-dashed rounded-md p-4 mt-2 cursor-pointer"
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p>Drop the files here ...</p>
+                ) : (
+                  <p>Drag 'n' drop some files here, or click to select files</p>
+                )}
+              </div>
+              {uploadedImages.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {uploadedImages.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(file) || "/placeholder.svg"}
+                        alt={`Uploaded image ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <Button type="submit">Add Product</Button>
