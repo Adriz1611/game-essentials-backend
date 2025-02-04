@@ -4,7 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const data = await fetchProducts()
+  console.log(data)
   return (
     <div className="w-full">
          <div className="w-full flex flex-row justify-between">
@@ -13,7 +15,7 @@ export default function ProductsPage() {
         <Button>Add Product</Button>
         </Link>
          </div>
-        <ProductList />
+        <ProductList data={data}/>
     </div>
   )
 }

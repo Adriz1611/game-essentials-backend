@@ -30,8 +30,8 @@ const mockProducts = [
   { id: 5, name: "Software License", price: 49.99, currency: "USD", category: "Software", isActive: true, isDigital: true },
 ]
 
-export default function ProductList() {
-  const [products, setProducts] = useState(mockProducts)
+export default function ProductList({ data }) {
+  const [products, setProducts] = useState(data)
   const [sortConfig, setSortConfig] = useState(null)
 
   const sortProducts = (key) => {
@@ -56,19 +56,19 @@ export default function ProductList() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">ID</TableHead>
+          <TableHead className="w-[300px]">ID</TableHead>
           <TableHead>
-            <Button variant="ghost" onClick={() => sortProducts('name')}>
+            <Button variant="ghost" onClick={() => sortProducts("name")}>
               Name <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
           <TableHead>
-            <Button variant="ghost" onClick={() => sortProducts('price')}>
+            <Button variant="ghost" onClick={() => sortProducts("price")}>
               Price <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
           <TableHead>
-            <Button variant="ghost" onClick={() => sortProducts('category')}>
+            <Button variant="ghost" onClick={() => sortProducts("category")}>
               Category <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
@@ -83,15 +83,15 @@ export default function ProductList() {
             <TableCell className="font-medium">{product.id}</TableCell>
             <TableCell>{product.name}</TableCell>
             <TableCell>{`${product.price} ${product.currency}`}</TableCell>
-            <TableCell>{product.category}</TableCell>
+            <TableCell>{product.categories.name}</TableCell>
             <TableCell>
-              <Badge variant={product.isActive ? "success" : "destructive"}>
-                {product.isActive ? "Active" : "Inactive"}
+              <Badge variant={product.is_active ? "success" : "destructive"}>
+                {product.is_active ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
             <TableCell>
-              <Badge variant={product.isDigital ? "secondary" : "default"}>
-                {product.isDigital ? "Digital" : "Physical"}
+              <Badge variant={product.is_digital ? "secondary" : "default"}>
+                {product.is_digital ? "Digital" : "Physical"}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
@@ -104,7 +104,11 @@ export default function ProductList() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => navigator.clipboard.writeText(product.id.toString())}>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      navigator.clipboard.writeText(product.id.toString())
+                    }
+                  >
                     Copy product ID
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -117,5 +121,5 @@ export default function ProductList() {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
