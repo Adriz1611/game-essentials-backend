@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Settings, Users, Layers2, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, Package, Settings, Users, Layers2, ShoppingCart, TagIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -19,6 +19,7 @@ const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Products", href: "/dashboard/products", icon: Package },
   { title: "Categories", href: "/dashboard/categories", icon: Layers2 },
+  { title: "Tags", href: "/dashboard/tags", icon: TagIcon },
   { title: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
   { title: "Customers", href: "/dashboard/customers", icon: Users },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
