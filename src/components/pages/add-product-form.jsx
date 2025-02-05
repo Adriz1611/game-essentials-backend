@@ -34,6 +34,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addProduct } from "@/app/actions/product-action";
+import { uploadProductImages } from "@/utils/image-upload";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -104,12 +105,32 @@ export default function AddProductForm({ data }) {
   });
 
   async function onSubmit(values) {
-    const res = await addProduct(values);
-    if (!res.success) {
-      alert(res.error?.message);
-    } else {
-      alert("Product added successfully!");
-      form.reset();
+    try {
+      // First, upload the images and get array of URLs
+      const { imageUrls, error: uploadError } = await uploadProductImages(
+        uploadedImages,
+        crypto.randomUUID()
+      );
+
+      if (uploadError) {
+        alert("Error uploading images: " + uploadError.message);
+        return;
+      }
+
+      // Add the image URLs array to the product data
+      const productData = {
+        ...values,
+        images: imageUrls,
+      };
+      const res = await addProduct(productData);
+      if (!res.success) {
+        alert(res.error?.message);
+      } else {
+        alert("Product added successfully!");
+        form.reset();
+      }
+    } catch (error) {
+      alert("Error adding product: " + error.message);
     }
   }
 
@@ -168,7 +189,11 @@ export default function AddProductForm({ data }) {
                         placeholder="0.00"
                         {...field}
                         onChange={(e) =>
-                          field.onChange(e.target.value === "" ? "" : Number.parseFloat(e.target.value))
+                          field.onChange(
+                            e.target.value === ""
+                              ? ""
+                              : Number.parseFloat(e.target.value)
+                          )
                         }
                         value={field.value === 0 ? "" : field.value}
                       />
@@ -216,7 +241,11 @@ export default function AddProductForm({ data }) {
                       placeholder="0"
                       {...field}
                       onChange={(e) =>
-                        field.onChange(e.target.value === "" ? 0 : Number.parseInt(e.target.value))
+                        field.onChange(
+                          e.target.value === ""
+                            ? 0
+                            : Number.parseInt(e.target.value)
+                        )
                       }
                       value={field.value === 0 ? "" : field.value}
                     />

@@ -50,6 +50,7 @@ export const addProduct = async (formData) => {
       stock_quantity: formData.stockQuantity,
       category_id: formData.category,
       specifications: formData.specifications,
+      images: formData.images,
       is_digital: formData.isActive,
       is_active: formData.isDigital,
     },
@@ -66,8 +67,7 @@ export const addProduct = async (formData) => {
     };
   }
 
-  revalidatePath("/products");
-  redirect("/products")
+  revalidatePath("/products")
 
   return {
     data,
