@@ -1,7 +1,7 @@
 import ProductList from "@/components/pages/list-product";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function ProductsPage() {
   const data = await fetchProducts();
