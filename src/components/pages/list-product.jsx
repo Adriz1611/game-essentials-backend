@@ -105,7 +105,7 @@ export default function ProductList({ data }) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[300px]">ID</TableHead>
+          <TableHead className="w-[100px]">Sl No</TableHead>
           <TableHead>
             <Button variant="ghost" onClick={() => sortProducts("name")}>
               Name <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -127,9 +127,9 @@ export default function ProductList({ data }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {products.map((product) => (
+        {products.map((product, index) => (
           <TableRow key={product.id}>
-            <TableCell className="font-medium">{product.id}</TableCell>
+            <TableCell className="font-medium">{index + 1}</TableCell>
             <TableCell>{product.name}</TableCell>
             <TableCell>{`${product.price} ${product.currency}`}</TableCell>
             <TableCell>{product.categories.name}</TableCell>
@@ -168,6 +168,7 @@ export default function ProductList({ data }) {
                   >
                     <DropdownMenuItem>Edit product</DropdownMenuItem>
                   </Link>
+                  <DropdownMenuItem>Delete product</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

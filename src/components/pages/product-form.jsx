@@ -40,12 +40,9 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  description: z
-    .string()
-    .min(10, {
-      message: "Description must be at least 4 characters.",
-    })
-    .optional(),
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters.",
+  }),
   price: z.number().positive({
     message: "Price must be a positive number.",
   }),
@@ -74,7 +71,7 @@ export default function ProductForm({ product_data, categories_data }) {
     product_data?.images || []
   );
   const [categories, setCategories] = useState(categories_data);
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -286,14 +283,14 @@ export default function ProductForm({ product_data, categories_data }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                       {categories.map((category) => (
+                      {categories.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
                         >
                           {category.name}
                         </SelectItem>
-                      ))} 
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -303,7 +300,7 @@ export default function ProductForm({ product_data, categories_data }) {
 
             <div>
               <Label>Specifications</Label>
-               {fields.map((field, index) => (
+              {fields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 mt-2">
                   <Input
                     {...form.register(`specifications.${index}.key`)}
@@ -321,7 +318,7 @@ export default function ProductForm({ product_data, categories_data }) {
                     Remove
                   </Button>
                 </div>
-              ))} 
+              ))}
               <Button
                 type="button"
                 onClick={() => append({ key: "", value: "" })}
@@ -389,7 +386,7 @@ export default function ProductForm({ product_data, categories_data }) {
                   <p>Drag 'n' drop some files here, or click to select files</p>
                 )}
               </div>
-             {uploadedImages.length > 0 && (
+              {uploadedImages.length > 0 && (
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {uploadedImages.map((file, index) => (
                     <div key={index} className="relative">
@@ -410,7 +407,7 @@ export default function ProductForm({ product_data, categories_data }) {
                     </div>
                   ))}
                 </div>
-              )} 
+              )}
             </div>
 
             <Button type="submit">

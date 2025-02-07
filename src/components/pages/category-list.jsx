@@ -61,9 +61,9 @@ export default function CategoryList({ data }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <TableRow key={category.id}>
-              <TableCell className="font-medium">{category.id}</TableCell>
+              <TableCell className="font-medium">{index + 1}</TableCell>
               <TableCell>{category.name}</TableCell>
               <TableCell>{category.description}</TableCell>
               <TableCell>{getParentCategoryName(category.parent_id)}</TableCell>

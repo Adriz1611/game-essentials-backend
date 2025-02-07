@@ -1,5 +1,7 @@
 "use server";
+import { deleteProductImage } from "@/utils/image-upload";
 import { createClient } from "@/utils/supabase/server";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 export const addCategory = async (formData) => {
@@ -88,7 +90,7 @@ export const updateProduct = async (id, productData) => {
       is_digital: productData.isActive,
       is_active: productData.isDigital,
     })
-    .eq('id', id)
+    .eq("id", id)
     .select();
 
   if (error) {
