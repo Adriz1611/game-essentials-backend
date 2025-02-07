@@ -55,7 +55,41 @@ export const addProduct = async (formData) => {
       },
     ])
     .select();
-  console.log({ data, error });
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/products");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const updateProduct = async (id, productData) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .update({
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      currency: productData.currency,
+      stock_quantity: productData.stockQuantity,
+      category_id: productData.category,
+      specifications: productData.specifications,
+      images: productData.images,
+      is_digital: productData.isActive,
+      is_active: productData.isDigital,
+    })
+    .eq('id', id)
+    .select();
 
   if (error) {
     return {
@@ -86,7 +120,6 @@ export const addTag = async (formData) => {
       },
     ])
     .select();
-  console.log({ data, error });
 
   if (error) {
     return {
@@ -98,6 +131,35 @@ export const addTag = async (formData) => {
   }
 
   revalidatePath("/tags");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const addProductToTag = async (formData) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products_tags")
+    .upsert([
+      {
+        product_id: formData.product_id,
+        tags_id: formData.tags_id,
+      },
+    ])
+    .select();
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/products_tags");
 
   return {
     data,

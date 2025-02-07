@@ -1,6 +1,4 @@
 "use client";
-import { useForm, useFieldArray } from "react-hook-form";
-import { useState, useCallback } from "react";
 import { X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +31,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { addProduct } from "@/app/actions/product-action";
+import { addProduct, updateProduct } from "@/app/actions/product-action";
 import { uploadProductImages } from "@/utils/image-upload";
+import { useEffect, useState, useCallback } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -68,21 +68,25 @@ const formSchema = z.object({
   isDigital: z.boolean(),
 });
 
-export default function AddProductForm({ data }) {
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [categories, setCategories] = useState(data);
+export default function ProductForm({ product_data, categories_data }) {
+  const isEditMode = !!product_data;
+  const [uploadedImages, setUploadedImages] = useState(
+    product_data?.images || []
+  );
+  const [categories, setCategories] = useState(categories_data);
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      currency: "",
-      stockQuantity: 0,
-      category: "",
-      specifications: [{ key: "", value: "" }],
-      isActive: false,
-      isDigital: false,
+      name: product_data?.name || "",
+      description: product_data?.description || "",
+      price: product_data?.price || 0,
+      currency: product_data?.currency || "",
+      stockQuantity: product_data?.stock_quantity || 0,
+      category: product_data?.category_id || "",
+      specifications: product_data?.specifications || [{ key: "", value: "" }],
+      isActive: product_data?.is_active || false,
+      isDigital: product_data?.is_digital || false,
     },
   });
 
@@ -125,24 +129,32 @@ export default function AddProductForm({ data }) {
         ...values,
         images: imageUrls,
       };
-      const res = await addProduct(productData);
+
+      const res = isEditMode
+        ? await updateProduct(product_data.id, productData)
+        : await addProduct(productData);
+
       if (!res.success) {
         alert(res.error?.message);
       } else {
-        alert("Product added successfully!");
+        alert(`Product ${isEditMode ? "updated" : "added"} successfully!`);
         form.reset();
       }
     } catch (error) {
-      alert("Error adding product: " + error.message);
+      alert(
+        `Error ${isEditMode ? "updating" : "adding"} product: ` + error.message
+      );
     }
   }
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Add New Product</CardTitle>
+        <CardTitle>{isEditMode ? "Edit Product" : "Add New Product"}</CardTitle>
         <CardDescription>
-          Enter the details for the new product.
+          {isEditMode
+            ? "Update the details for the product."
+            : "Enter the details for the new product."}
         </CardDescription>
       </CardHeader>
       <CardContent className="w-full">
@@ -274,14 +286,14 @@ export default function AddProductForm({ data }) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                       {categories.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
                         >
                           {category.name}
                         </SelectItem>
-                      ))}
+                      ))} 
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -291,7 +303,7 @@ export default function AddProductForm({ data }) {
 
             <div>
               <Label>Specifications</Label>
-              {fields.map((field, index) => (
+               {fields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 mt-2">
                   <Input
                     {...form.register(`specifications.${index}.key`)}
@@ -309,7 +321,7 @@ export default function AddProductForm({ data }) {
                     Remove
                   </Button>
                 </div>
-              ))}
+              ))} 
               <Button
                 type="button"
                 onClick={() => append({ key: "", value: "" })}
@@ -377,12 +389,12 @@ export default function AddProductForm({ data }) {
                   <p>Drag 'n' drop some files here, or click to select files</p>
                 )}
               </div>
-              {uploadedImages.length > 0 && (
+             {uploadedImages.length > 0 && (
                 <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {uploadedImages.map((file, index) => (
                     <div key={index} className="relative">
                       <img
-                        src={URL.createObjectURL(file) || "/placeholder.svg"}
+                        src={isEditMode ? file : URL.createObjectURL(file)}
                         alt={`Uploaded image ${index + 1}`}
                         className="w-full h-32 object-cover rounded-md"
                       />
@@ -398,10 +410,12 @@ export default function AddProductForm({ data }) {
                     </div>
                   ))}
                 </div>
-              )}
+              )} 
             </div>
 
-            <Button type="submit">Add Product</Button>
+            <Button type="submit">
+              {isEditMode ? "Update Product" : "Add Product"}
+            </Button>
           </form>
         </Form>
       </CardContent>

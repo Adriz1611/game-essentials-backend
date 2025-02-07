@@ -1,57 +1,106 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // This is a mock data structure. In a real application, you'd fetch this from an API.
 const mockProducts = [
-  { id: 1, name: "Laptop", price: 999.99, currency: "USD", category: "Electronics", isActive: true, isDigital: false },
-  { id: 2, name: "Smartphone", price: 599.99, currency: "USD", category: "Electronics", isActive: true, isDigital: false },
-  { id: 3, name: "E-book", price: 9.99, currency: "USD", category: "Books", isActive: true, isDigital: true },
-  { id: 4, name: "T-shirt", price: 19.99, currency: "USD", category: "Clothing", isActive: false, isDigital: false },
-  { id: 5, name: "Software License", price: 49.99, currency: "USD", category: "Software", isActive: true, isDigital: true },
-]
+  {
+    id: 1,
+    name: "Laptop",
+    price: 999.99,
+    currency: "USD",
+    category: "Electronics",
+    isActive: true,
+    isDigital: false,
+  },
+  {
+    id: 2,
+    name: "Smartphone",
+    price: 599.99,
+    currency: "USD",
+    category: "Electronics",
+    isActive: true,
+    isDigital: false,
+  },
+  {
+    id: 3,
+    name: "E-book",
+    price: 9.99,
+    currency: "USD",
+    category: "Books",
+    isActive: true,
+    isDigital: true,
+  },
+  {
+    id: 4,
+    name: "T-shirt",
+    price: 19.99,
+    currency: "USD",
+    category: "Clothing",
+    isActive: false,
+    isDigital: false,
+  },
+  {
+    id: 5,
+    name: "Software License",
+    price: 49.99,
+    currency: "USD",
+    category: "Software",
+    isActive: true,
+    isDigital: true,
+  },
+];
 
 export default function ProductList({ data }) {
-  const [products, setProducts] = useState(data)
-  const [sortConfig, setSortConfig] = useState(null)
+  const [products, setProducts] = useState(data);
+  const [sortConfig, setSortConfig] = useState(null);
 
   const sortProducts = (key) => {
-    let direction = 'asc'
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc'
+    let direction = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
     }
-    setSortConfig({ key, direction })
+    setSortConfig({ key, direction });
 
-    setProducts([...products].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === 'asc' ? -1 : 1
-      }
-      if (a[key] > b[key]) {
-        return direction === 'asc' ? 1 : -1
-      }
-      return 0
-    }))
-  }
+    setProducts(
+      [...products].sort((a, b) => {
+        if (a[key] < b[key]) {
+          return direction === "asc" ? -1 : 1;
+        }
+        if (a[key] > b[key]) {
+          return direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      })
+    );
+  };
 
+  const router = useRouter();
   return (
     <Table>
       <TableHeader>
@@ -112,8 +161,13 @@ export default function ProductList({ data }) {
                     Copy product ID
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>View product</DropdownMenuItem>
-                  <DropdownMenuItem>Edit product</DropdownMenuItem>
+                  <Link
+                    href={
+                      "/dashboard/products/" + product.id.toString() + "/edit"
+                    }
+                  >
+                    <DropdownMenuItem>Edit product</DropdownMenuItem>
+                  </Link>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

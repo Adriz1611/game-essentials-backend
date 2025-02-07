@@ -1,26 +1,23 @@
-import AddProductForm from "@/components/pages/add-product-form"
+import AddProductForm from "@/components/pages/product-form";
 import { createClient } from "@/utils/supabase/server";
 export default async function ProductsPage() {
-  const data = await fetchCategories()
+  const data = await fetchCategories();
   return (
     <div className="w-full">
       <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
-      <AddProductForm data={data} />
+      <AddProductForm categories_data={data} />
     </div>
-  )
+  );
 }
 
 async function fetchCategories() {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, name');
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("categories").select("id, name");
 
   if (error) {
-    console.error('Error fetching categories:', error);
+    console.error("Error fetching categories:", error);
     return [];
   }
 
   return data;
-  
 }

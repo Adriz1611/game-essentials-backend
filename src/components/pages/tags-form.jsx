@@ -1,28 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { addTag } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tag name must be at least 2 characters.",
   }),
-  description: z.string().min(4, {
-    message: "Description must be at least 10 characters.",
-  }).optional(),
-  isActive: z.boolean().default(true),
-})
+  description: z
+    .string()
+    .min(4, {
+      message: "Description must be at least 10 characters.",
+    })
+    .optional(),
+  isActive: z.boolean(),
+});
 
 export default function TagForm() {
-  const [tags, setTags] = useState([])
+  const [tags, setTags] = useState([]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -31,23 +49,16 @@ export default function TagForm() {
       description: "",
       isActive: true,
     },
-  })
+  });
 
-  function onSubmit(values) {
-    // Here you would typically send the data to your backend
-    console.log(values)
-
-    // For demonstration, we'll add the new tag to our local state
-    const newTag = {
-      id: tags.length + 1,
-      ...values,
+  async function onSubmit(values) {
+    const res = await addTag(values);
+    if (res.success) {
+      form.reset();
+      alert("Tag added successfully!");
+    } else {
+      alert(res.error?.message);
     }
-    setTags([...tags, newTag])
-
-    // Reset the form
-    form.reset()
-
-    alert("Tag added successfully!")
   }
 
   return (
@@ -94,10 +105,15 @@ export default function TagForm() {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Active</FormLabel>
-                    <FormDescription>Set the tag as active or inactive</FormDescription>
+                    <FormDescription>
+                      Set the tag as active or inactive
+                    </FormDescription>
                   </div>
                   <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -108,6 +124,5 @@ export default function TagForm() {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }
-
