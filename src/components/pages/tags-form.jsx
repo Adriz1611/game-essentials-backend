@@ -15,10 +15,10 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tag name must be at least 2 characters.",
   }),
-  description: z.string().min(10, {
+  description: z.string().min(4, {
     message: "Description must be at least 10 characters.",
-  }),
-  isActive: z.boolean(),
+  }).optional(),
+  isActive: z.boolean().default(true),
 })
 
 export default function TagForm() {

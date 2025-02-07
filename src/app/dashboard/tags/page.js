@@ -10,7 +10,7 @@ export default function TagsPage() {
           <Link href={`/dashboard/tags/add`}>
             <Button variant="outline">Create tags</Button>
           </Link>
-          <Link href={`/dashboard/tags/add`}>
+          <Link href={`/dashboard/tags/link`}>
             <Button >Link Products</Button>
           </Link>
         </div>

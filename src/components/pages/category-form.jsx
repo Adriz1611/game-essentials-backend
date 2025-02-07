@@ -39,7 +39,7 @@ const formSchema = z.object({
   }),
   description: z.string().min(10, {
     message: "Description must be at least 10 characters.",
-  }),
+  }).optional(),
   parent_category_id: z.string().optional(),
 });
 

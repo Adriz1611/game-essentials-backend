@@ -41,10 +41,10 @@ export default function ProductTagAssociation() {
   const [filteredProducts, setFilteredProducts] = useState(mockProducts)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
-  const [selectedProduct, setSelectedProduct] = useState<number | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const [availableTags, setAvailableTags] = useState(mockTags)
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       search: "",
