@@ -82,8 +82,8 @@ export default function ProductForm({ product_data, categories_data }) {
       stockQuantity: product_data?.stock_quantity || 0,
       category: product_data?.category_id || "",
       specifications: product_data?.specifications || [{ key: "", value: "" }],
-      isActive: product_data?.is_active || false,
-      isDigital: product_data?.is_digital || false,
+      isActive: product_data?.is_active ?? false,
+      isDigital: product_data?.is_digital ?? false,
     },
   });
 
@@ -135,7 +135,6 @@ export default function ProductForm({ product_data, categories_data }) {
         alert(res.error?.message);
       } else {
         alert(`Product ${isEditMode ? "updated" : "added"} successfully!`);
-        form.reset();
       }
     } catch (error) {
       alert(

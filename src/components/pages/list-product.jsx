@@ -23,55 +23,6 @@ import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-// This is a mock data structure. In a real application, you'd fetch this from an API.
-const mockProducts = [
-  {
-    id: 1,
-    name: "Laptop",
-    price: 999.99,
-    currency: "USD",
-    category: "Electronics",
-    isActive: true,
-    isDigital: false,
-  },
-  {
-    id: 2,
-    name: "Smartphone",
-    price: 599.99,
-    currency: "USD",
-    category: "Electronics",
-    isActive: true,
-    isDigital: false,
-  },
-  {
-    id: 3,
-    name: "E-book",
-    price: 9.99,
-    currency: "USD",
-    category: "Books",
-    isActive: true,
-    isDigital: true,
-  },
-  {
-    id: 4,
-    name: "T-shirt",
-    price: 19.99,
-    currency: "USD",
-    category: "Clothing",
-    isActive: false,
-    isDigital: false,
-  },
-  {
-    id: 5,
-    name: "Software License",
-    price: 49.99,
-    currency: "USD",
-    category: "Software",
-    isActive: true,
-    isDigital: true,
-  },
-];
-
 export default function ProductList({ data }) {
   const [products, setProducts] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
@@ -121,6 +72,7 @@ export default function ProductList({ data }) {
               Category <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
+          <TableHead>Stock</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Type</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -133,6 +85,7 @@ export default function ProductList({ data }) {
             <TableCell>{product.name}</TableCell>
             <TableCell>{`${product.price} ${product.currency}`}</TableCell>
             <TableCell>{product.categories.name}</TableCell>
+            <TableCell>{product.stock_quantity}</TableCell>
             <TableCell>
               <Badge variant={product.is_active ? "success" : "destructive"}>
                 {product.is_active ? "Active" : "Inactive"}
