@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+
 export const addCategory = async (formData) => {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -194,6 +195,83 @@ export const addProductToTag = async (formData) => {
   }
 
   revalidatePath("/products_tags");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const searchProductByName = async (productName) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name")
+    .textSearch("name", productName);
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const linkProductTag = async ({ tagId, productId }) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("product_tags")
+    .insert([
+      {
+        product_id: productId,
+        tags_id: tagId,
+      },
+    ])
+    .select();
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/tags/" + tagId + "/link");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const deleteTaggedProduct = async (productId, tagId) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("product_tags")
+    .delete()
+    .eq("product_id", productId)
+    .eq("tags_id", tagId);
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/tags/" + tagId + "/link");
 
   return {
     data,

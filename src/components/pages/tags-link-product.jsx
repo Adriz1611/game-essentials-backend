@@ -1,75 +1,122 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
-// Sample products data
-const sampleProducts = [
-  { id: 1, name: "Smartphone X" },
-  { id: 2, name: "Laptop Pro" },
-  { id: 3, name: "Wireless Earbuds" },
-  { id: 4, name: "4K Smart TV" },
-  { id: 5, name: "Gaming Console" },
-  { id: 6, name: "Fitness Tracker" },
-  { id: 7, name: "Digital Camera" },
-  { id: 8, name: "Bluetooth Speaker" },
-  { id: 9, name: "Tablet Ultra" },
-  { id: 10, name: "Smartwatch" },
-]
+import {
+  deleteTaggedProduct,
+  linkProductTag,
+  searchProductByName,
+} from "@/app/actions/product-action";
 
 const formSchema = z.object({
   search: z.string().min(1, "Product name is required"),
-})
+});
 
-export default function TagProductAssociation({ tagId, tagName }) {
-  const [products, setProducts] = useState(sampleProducts)
-  const [taggedProducts, setTaggedProducts] = useState([])
-  const [searchResults, setSearchResults] = useState([])
-  const [selectedProducts, setSelectedProducts] = useState([])
+export default function TagProductAssociation({
+  tagId,
+  tagName,
+  taggedProductsData,
+}) {
+  const [taggedProducts, setTaggedProducts] = useState([]);
+  useEffect(() => {
+    if (taggedProductsData?.length) {
+      setTaggedProducts(taggedProductsData);
+    }
+  }, [taggedProductsData]);
+
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       search: "",
     },
-  })
+  });
 
-  const onSubmit = (values) => {
-    const results = products.filter((p) => p.name.toLowerCase().includes(values.search.toLowerCase())).slice(0, 5)
-    setSearchResults(results)
-  }
+  const onSubmit = async (values) => {
+    const res = await searchProductByName(values.search.toLowerCase());
+    if (res.success) {
+      setSearchResults(res.data);
+    } else {
+      console.error(res.error);
+      setSearchResults([]);
+    }
+  };
 
   const toggleProductSelection = (productId) => {
     setSelectedProducts((prev) =>
-      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
-    )
-  }
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
+  };
 
-  const addProductsToTag = () => {
-    setTaggedProducts((prev) => [...new Set([...prev, ...selectedProducts])])
-    setSelectedProducts([])
-    setSearchResults([])
-    form.reset()
-  }
+  const addProductsToTag = async () => {
+    for (const productId of selectedProducts) {
+      const res = await linkProductTag({ tagId, productId });
+      if (res.success) {
+        const product = searchResults.find((p) => p.id === productId);
+        if (product) {
+          setTaggedProducts((prev) => [...prev, product]);
+        }
+      } else {
+        console.error(`Failed to link product ${productId}:`, res.error);
+      }
+    }
 
-  const removeProductFromTag = (productId) => {
-    setTaggedProducts((prev) => prev.filter((id) => id !== productId))
-  }
+    setSelectedProducts([]);
+    setSearchResults([]);
+    form.reset();
+  };
+
+  const removeProductFromTag = async (productId) => {
+    const res = await deleteTaggedProduct(productId, tagId);
+    if (res.success) {
+      setTaggedProducts((prev) => prev.filter(product => product.id !== productId));
+      alert("Product Tag deleted successfully");
+    } else {
+      alert("Error occured " + res.error?.message);
+    }
+  };
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Associate Products with Tag: {tagName}</CardTitle>
-        <CardDescription>Search for products and add them to this tag.</CardDescription>
+        <CardDescription>
+          Search for products and add them to this tag.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -111,7 +158,9 @@ export default function TagProductAssociation({ tagId, tagName }) {
                     <TableCell>
                       <Checkbox
                         checked={selectedProducts.includes(product.id)}
-                        onCheckedChange={() => toggleProductSelection(product.id)}
+                        onCheckedChange={() =>
+                          toggleProductSelection(product.id)
+                        }
                       />
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
@@ -119,14 +168,20 @@ export default function TagProductAssociation({ tagId, tagName }) {
                 ))}
               </TableBody>
             </Table>
-            <Button className="mt-4" onClick={addProductsToTag} disabled={selectedProducts.length === 0}>
+            <Button
+              className="mt-4"
+              onClick={addProductsToTag}
+              disabled={selectedProducts.length === 0}
+            >
               Add Selected Products to {tagName}
             </Button>
           </div>
         )}
 
         <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4">Products Tagged with {tagName}</h3>
+          <h3 className="text-lg font-semibold mb-4">
+            Products Tagged with {tagName}
+          </h3>
           <ScrollArea className="h-[300px]">
             <Table>
               <TableHeader>
@@ -136,25 +191,25 @@ export default function TagProductAssociation({ tagId, tagName }) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {taggedProducts.map((productId) => {
-                  const product = products.find((p) => p.id === productId)
-                  return product ? (
-                    <TableRow key={productId}>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>
-                        <Button variant="destructive" size="sm" onClick={() => removeProductFromTag(productId)}>
-                          Remove
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ) : null
-                })}
+                {taggedProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeProductFromTag(product.id)}
+                      >
+                        Remove
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </ScrollArea>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
