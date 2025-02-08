@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -159,16 +159,18 @@ export default function ProductList({ data }) {
                       navigator.clipboard.writeText(product.id.toString())
                     }
                   >
+                    {" "}
+                    <Copy />
                     Copy product ID
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <Link href={"/dashboard/products/" + product.id.toString()}>
                     <DropdownMenuItem className="cursor-pointer">
-                      Edit product
+                      <Pencil /> Edit
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuItem className="cursor-pointer">
-                    Delete product
+                    <Trash /> Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Copy } from "lucide-react";
 import Link from "next/link";
 
 export default function CategoryList({ data }) {
@@ -93,7 +93,7 @@ export default function CategoryList({ data }) {
                       onClick={() =>
                         navigator.clipboard.writeText(category.id.toString())
                       }
-                    >
+                    > <Copy />
                       Copy category ID
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -101,11 +101,11 @@ export default function CategoryList({ data }) {
                       href={"/dashboard/categories/" + category.id.toString()}
                     >
                       <DropdownMenuItem className="cursor-pointer">
-                        Edit category
+                        <Pencil /> Edit
                       </DropdownMenuItem>
                     </Link>
                     <DropdownMenuItem className="cursor-pointer">
-                      Delete category
+                      <Trash /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
