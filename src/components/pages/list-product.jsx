@@ -154,6 +154,7 @@ export default function ProductList({ data }) {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={() =>
                       navigator.clipboard.writeText(product.id.toString())
                     }
@@ -161,14 +162,14 @@ export default function ProductList({ data }) {
                     Copy product ID
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <Link
-                    href={
-                      "/dashboard/products/" + product.id.toString() + "/edit"
-                    }
-                  >
-                    <DropdownMenuItem>Edit product</DropdownMenuItem>
+                  <Link href={"/dashboard/products/" + product.id.toString()}>
+                    <DropdownMenuItem className="cursor-pointer">
+                      Edit product
+                    </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem>Delete product</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Delete product
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

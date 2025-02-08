@@ -7,7 +7,6 @@ export async function uploadProductImages(files, productId) {
 
     const uploadPromises = files.map(async (file) => {
       if (typeof file === "string") {
-        // If the file is already a URL, return it as is
         return file;
       }
 
@@ -17,9 +16,8 @@ export async function uploadProductImages(files, productId) {
         .substring(2)}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
-      // Upload the file to Supabase storage
       const { data, error } = await supabase.storage
-        .from("product-images") // Your bucket name
+        .from("product-images") 
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: true,
@@ -29,7 +27,6 @@ export async function uploadProductImages(files, productId) {
         throw error;
       }
 
-      // Get the public URL for the uploaded file
       const {
         data: { publicUrl },
       } = supabase.storage.from("product-images").getPublicUrl(filePath);
@@ -37,7 +34,6 @@ export async function uploadProductImages(files, productId) {
       return publicUrl;
     });
 
-    // Wait for all uploads to complete and return as an array
     const imageUrls = await Promise.all(uploadPromises);
 
     return { imageUrls, error: null };

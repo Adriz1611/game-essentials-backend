@@ -5,9 +5,9 @@ export default async function ProductsPage() {
   return (
     <div className="w-full">
       <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
-      <AddCategoryForm data={data}/>
+      <AddCategoryForm categories_data={data} />
     </div>
-  )
+  );
 }
 
 async function fetchCategories() {

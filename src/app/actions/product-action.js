@@ -1,9 +1,7 @@
 "use server";
-import { deleteProductImage } from "@/utils/image-upload";
-import { createClient } from "@/utils/supabase/server";
 
+import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 export const addCategory = async (formData) => {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -20,6 +18,40 @@ export const addCategory = async (formData) => {
     ])
     .select();
   console.log({ data, error });
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/categories");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const updateCategory = async (id, formData) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .update({
+      name: formData.name,
+      description: formData.description,
+      parent_id:
+        formData.parent_category_id === undefined ||
+        formData.parent_category_id === "0"
+          ? null
+          : formData.parent_category_id,
+    })
+    .eq("id", id)
+    .select();
 
   if (error) {
     return {

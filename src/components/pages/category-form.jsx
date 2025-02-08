@@ -30,48 +30,63 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { addCategory } from "@/app/actions/product-action";
-
+import { addCategory, updateCategory } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Category name must be at least 2 characters.",
   }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }).optional(),
+  description: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters.",
+    })
+    .optional(),
   parent_category_id: z.string().optional(),
 });
 
-export default function AddCategoryForm({ data }) {
-  const [categories, setCategories] = useState(data);
+export default function AddCategoryForm({ categories_data, category_id }) {
+  const [categories] = useState(categories_data);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      parent_category_id: undefined,
+      name: category_id ? category_id.name : "",
+      description: category_id ? category_id.description : "",
+      parent_category_id: category_id ? category_id.parent_id : undefined,
     },
   });
 
   const onSubmit = async (values) => {
-    const result = await addCategory(values);
-    if (result.success) {
-      form.reset();
-      alert("Category added successfully!");
+    if (category_id) {
+      const result = await updateCategory(category_id.id, values);
+      if (result.success) {
+        alert("Category updated successfully!");
+      } else {
+        alert(result.error?.message);
+      }
     } else {
-      alert(result.error?.message);
+      const result = await addCategory(values);
+      if (result.success) {
+        form.reset();
+        alert("Category added successfully!");
+      } else {
+        alert(result.error?.message);
+      }
     }
-
-    
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add New Category</CardTitle>
-        <CardDescription>Create a new product category.</CardDescription>
+        <CardTitle>
+          {category_id ? "Edit Category" : "Add New Category"}
+        </CardTitle>
+        <CardDescription>
+          {category_id
+            ? "Edit the details of the category."
+            : "Create a new product category."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -124,7 +139,7 @@ export default function AddCategoryForm({ data }) {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="0">None</SelectItem>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem
                           key={category.id}
                           value={category.id.toString()}
@@ -142,7 +157,9 @@ export default function AddCategoryForm({ data }) {
               )}
             />
 
-            <Button type="submit">Add Category</Button>
+            <Button type="submit">
+              {category_id ? "Update Category" : "Add Category"}
+            </Button>
           </form>
         </Form>
       </CardContent>

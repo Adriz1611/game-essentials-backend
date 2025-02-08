@@ -1,8 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,46 +17,50 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import Link from "next/link";
 
 export default function CategoryList({ data }) {
-  const [categories, setCategories] = useState(data)
-  const [sortConfig, setSortConfig] = useState(null)
+  const [categories, setCategories] = useState(data);
+  const [sortConfig, setSortConfig] = useState(null);
 
   const sortCategories = (key) => {
-    let direction = "asc"
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc"
+    let direction = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
     }
-    setSortConfig({ key, direction })
+    setSortConfig({ key, direction });
 
     setCategories(
       [...categories].sort((a, b) => {
         if (a[key] < b[key]) {
-          return direction === "asc" ? -1 : 1
+          return direction === "asc" ? -1 : 1;
         }
         if (a[key] > b[key]) {
-          return direction === "asc" ? 1 : -1
+          return direction === "asc" ? 1 : -1;
         }
-        return 0
-      }),
-    )
-  }
+        return 0;
+      })
+    );
+  };
 
   const getParentCategoryName = (parentId) => {
-    if (parentId === null) return "None"
-    const parentCategory = categories.find((cat) => cat.id === parentId)
-    return parentCategory ? parentCategory.name : "Unknown"
-  }
+    if (parentId === null) return "None";
+    const parentCategory = categories.find((cat) => cat.id === parentId);
+    return parentCategory ? parentCategory.name : "Unknown";
+  };
 
   return (
     <div>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">ID</TableHead>
+            <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>
               <Button variant="ghost" onClick={() => sortCategories("name")}>
                 Name <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -77,12 +88,25 @@ export default function CategoryList({ data }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(category.id.toString())}>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigator.clipboard.writeText(category.id.toString())
+                      }
+                    >
                       Copy category ID
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>Edit category</DropdownMenuItem>
-                    <DropdownMenuItem>Delete category</DropdownMenuItem>
+                    <Link
+                      href={"/dashboard/categories/" + category.id.toString()}
+                    >
+                      <DropdownMenuItem className="cursor-pointer">
+                        Edit category
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem className="cursor-pointer">
+                      Delete category
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
@@ -91,6 +115,5 @@ export default function CategoryList({ data }) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
-

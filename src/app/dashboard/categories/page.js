@@ -8,7 +8,7 @@ export default async function CategoriesPage() {
   return (
     <div className="w-full">
       <div className="w-full flex flex-row justify-between">
-        <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
+        <h2 className="text-2xl font-bold mb-4">Manage Categories</h2>
         <Link href={`/dashboard/categories/add`}>
           <Button>Add Category</Button>
         </Link>
