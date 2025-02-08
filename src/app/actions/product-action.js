@@ -165,7 +165,34 @@ export const addTag = async (formData) => {
     };
   }
 
-  revalidatePath("/tags");
+  revalidatePath("/dashboard/tags");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const updateTag = async (formData, id) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tags")
+    .update({
+      name: formData.name,
+      description: formData.description,
+      is_active: formData.isActive,
+    })
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    return {
+      error: { message: "Database error: " + error.message },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/tags/" + id);
 
   return {
     data,
@@ -194,7 +221,7 @@ export const addProductToTag = async (formData) => {
     };
   }
 
-  revalidatePath("/products_tags");
+  revalidatePath("/dashboard/tags/" + tagId + "/link");
 
   return {
     data,

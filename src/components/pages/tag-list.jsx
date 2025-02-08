@@ -118,9 +118,11 @@ export default function TagList({ tags_data }) {
                         <LinkIcon /> Link Products
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Pencil /> Edit
-                    </DropdownMenuItem>
+                    <Link href={`/dashboard/tags/` + tag.id.toString()}>
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Pencil /> Edit
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem className="cursor-pointer ">
                       <Trash /> Delete
                     </DropdownMenuItem>

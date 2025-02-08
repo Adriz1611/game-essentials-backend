@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { addTag } from "@/app/actions/product-action";
+import { addTag, updateTag } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,29 +33,33 @@ const formSchema = z.object({
   description: z
     .string()
     .min(4, {
-      message: "Description must be at least 10 characters.",
+      message: "Description must be at least 4 characters.",
     })
     .optional(),
   isActive: z.boolean(),
 });
 
-export default function TagForm() {
-  const [tags, setTags] = useState([]);
-
+export default function TagForm({ tags_data }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      isActive: true,
+      name: tags_data?.name || "",
+      description: tags_data?.description || "",
+      isActive: tags_data?.isActive ?? true,
     },
   });
 
   async function onSubmit(values) {
-    const res = await addTag(values);
+    let res;
+    if (tags_data) {
+      // Editing existing tag
+      res = await updateTag(values, tags_data.id );
+    } else {
+      // Adding a new tag
+      res = await addTag(values);
+    }
     if (res.success) {
-      form.reset();
-      alert("Tag added successfully!");
+      alert(tags_data ? "Tag updated successfully!" : "Tag added successfully!");
     } else {
       alert(res.error?.message);
     }
@@ -64,8 +68,10 @@ export default function TagForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add New Tag</CardTitle>
-        <CardDescription>Create a new product tag.</CardDescription>
+        <CardTitle>{tags_data ? "Edit Tag" : "Add New Tag"}</CardTitle>
+        <CardDescription>
+          {tags_data ? "Edit an existing product tag." : "Create a new product tag."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -119,7 +125,7 @@ export default function TagForm() {
               )}
             />
 
-            <Button type="submit">Add Tag</Button>
+            <Button type="submit">{tags_data ? "Update Tag" : "Add Tag"}</Button>
           </form>
         </Form>
       </CardContent>
