@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Settings, Users, Layers2, ShoppingCart, TagIcon } from "lucide-react";
+import { LayoutDashboard, ChevronRight, ChevronDown,  Package, Percent, Settings, Users, Layers2, ShoppingCart, TagIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -13,13 +13,34 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import { useState } from "react";
 
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Products", href: "/dashboard/products", icon: Package },
   { title: "Categories", href: "/dashboard/categories", icon: Layers2 },
   { title: "Tags", href: "/dashboard/tags", icon: TagIcon },
+  {
+    title: "Promotions",
+    href: "#",
+    icon: Percent,
+    submenu: [
+      {
+        title: "Discounts",
+        href: "/dashboard/promotions/discounts",
+        icon: TagIcon,
+      },
+      {
+        title: "Coupon Codes",
+        href: "/dashboard/promotions/coupons",
+        icon: TagIcon,
+      },
+    ],
+  },
   { title: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
   { title: "Customers", href: "/dashboard/customers", icon: Users },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -27,6 +48,11 @@ const navItems = [
 
 export default function SidebarLayout({ children }) {
   const pathname = usePathname();
+    const [openSubmenu, setOpenSubmenu] = useState(null);
+
+    const toggleSubmenu = (title) => {
+      setOpenSubmenu(openSubmenu === title ? null : title);
+    };
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -36,14 +62,53 @@ export default function SidebarLayout({ children }) {
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              {navItems.map((item, index) => (
-                <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
-                    <Link href={item.href}>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  {item.submenu ? (
+                    <>
+                      <SidebarMenuButton
+                        onClick={() => toggleSubmenu(item.title)}
+                        className="w-full flex items-center justify-between"
+                      >
+                        <div className="flex items-center">
+                          <item.icon className="mr-2 h-4 w-4" />
+                          <span>{item.title}</span>
+                        </div>
+                        {openSubmenu === item.title ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </SidebarMenuButton>
+                      {openSubmenu === item.title && (
+                        <SidebarMenuSub>
+                          {item.submenu.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.href}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={pathname === subItem.href}
+                              >
+                                <Link href={subItem.href}>
+                                  <subItem.icon className="mr-2 h-4 w-4" />
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      )}
+                    </>
+                  ) : (
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                    >
+                      <Link href={item.href}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
