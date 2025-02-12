@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/dist/server/api-utils";
 
 export const addCategory = async (formData) => {
   const supabase = await createClient();
@@ -63,7 +64,7 @@ export const updateCategory = async (id, formData) => {
     };
   }
 
-  revalidatePath("/categories");
+  revalidatePath("/dashboard/categories");
 
   return {
     data,
@@ -99,7 +100,8 @@ export const addProduct = async (formData) => {
     };
   }
 
-  revalidatePath("/products");
+  revalidatePath("/dashboard/products");
+  redirect("/dashboard/products");
 
   return {
     data,
@@ -109,6 +111,7 @@ export const addProduct = async (formData) => {
 
 export const updateProduct = async (id, productData) => {
   const supabase = await createClient();
+  console.log(productData);
   const { data, error } = await supabase
     .from("products")
     .update({
@@ -120,8 +123,8 @@ export const updateProduct = async (id, productData) => {
       category_id: productData.category,
       specifications: productData.specifications,
       images: productData.images,
-      is_digital: productData.isActive,
-      is_active: productData.isDigital,
+      is_digital: productData.isDigital,
+      is_active: productData.isActive,
     })
     .eq("id", id)
     .select();
@@ -135,7 +138,7 @@ export const updateProduct = async (id, productData) => {
     };
   }
 
-  revalidatePath("/products");
+  revalidatePath("/dashboard/products");
 
   return {
     data,

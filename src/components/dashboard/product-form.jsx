@@ -82,7 +82,7 @@ export default function ProductForm({ product_data, categories_data }) {
       stockQuantity: product_data?.stock_quantity || 0,
       category: product_data?.category_id || "",
       specifications: product_data?.specifications || [{ key: "", value: "" }],
-      isActive: product_data?.is_active ?? false,
+      isActive: product_data?.is_active ?? true,
       isDigital: product_data?.is_digital ?? false,
     },
   });
