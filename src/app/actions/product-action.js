@@ -236,7 +236,10 @@ export const searchProductByName = async (productName) => {
   const { data, error } = await supabase
     .from("products")
     .select("id, name")
-    .textSearch("name", productName);
+    .textSearch("name", productName, {
+      type: "websearch",
+      config: "english",
+    });
 
   if (error) {
     return {
