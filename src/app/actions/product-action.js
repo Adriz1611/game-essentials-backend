@@ -101,7 +101,6 @@ export const addProduct = async (formData) => {
   }
 
   revalidatePath("/dashboard/products");
-  redirect("/dashboard/products");
 
   return {
     data,
