@@ -1,4 +1,4 @@
-import TagForm from "@/components/pages/tags-form"
+import TagForm from "@/components/dashboard/tags-form";
 
 export default function TagsPage() {
   return (
@@ -6,5 +6,5 @@ export default function TagsPage() {
       <h2 className="text-2xl font-bold mb-4">Manage Product Tags</h2>
       <TagForm />
     </div>
-  )
+  );
 }

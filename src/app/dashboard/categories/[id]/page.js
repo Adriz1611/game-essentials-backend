@@ -1,4 +1,4 @@
-import AddCategoryForm from "@/components/pages/category-form";
+import AddCategoryForm from "@/components/dashboard/category-form";
 import { createClient } from "@/utils/supabase/server";
 export default async function EditProductPage({ params }) {
   const { id } = await params;
@@ -10,7 +10,10 @@ export default async function EditProductPage({ params }) {
   return (
     <div className="w-full">
       <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
-      <AddCategoryForm categories_data={categories} category_id={category_id[0]} />
+      <AddCategoryForm
+        categories_data={categories}
+        category_id={category_id[0]}
+      />
     </div>
   );
 }

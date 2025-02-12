@@ -1,4 +1,4 @@
-import TagProductAssociation from "@/components/pages/tags-link-product";
+import TagProductAssociation from "@/components/dashboard/tags-link-product";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function TagsLinkPage({ params }) {
@@ -30,12 +30,14 @@ async function fetchTagwithProducts(id) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("product_tags")
-    .select(`
+    .select(
+      `
       products (
         id,
         name
       )
-    `)
+    `
+    )
     .eq("tags_id", id);
 
   if (error) {
@@ -43,5 +45,5 @@ async function fetchTagwithProducts(id) {
     return [];
   }
 
-  return data.map(item => item.products);
+  return data.map((item) => item.products);
 }

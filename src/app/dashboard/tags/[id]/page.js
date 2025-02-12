@@ -1,13 +1,13 @@
-import TagForm from "@/components/pages/tags-form";
+import TagForm from "@/components/dashboard/tags-form";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function TagsPage({ params }) {
   const { id } = await params;
-  const data = await fetchTag(id)
+  const data = await fetchTag(id);
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-4">Manage Product Tags</h2>
-      <TagForm tags_data={data[0]}/>
+      <TagForm tags_data={data[0]} />
     </div>
   );
 }

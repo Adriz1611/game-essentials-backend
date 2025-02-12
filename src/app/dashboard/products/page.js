@@ -1,4 +1,4 @@
-import ProductList from "@/components/pages/list-product";
+import ProductList from "@/components/dashboard/list-product";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";

@@ -1,4 +1,4 @@
-import AddProductForm from "@/components/pages/product-form";
+import AddProductForm from "@/components/dashboard/product-form";
 import { createClient } from "@/utils/supabase/server";
 export default async function EditProductPage({ params }) {
   const { id } = await params;

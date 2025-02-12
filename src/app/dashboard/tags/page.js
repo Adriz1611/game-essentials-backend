@@ -1,9 +1,9 @@
-import TagList from "@/components/pages/tag-list";
+import TagList from "@/components/dashboard/tag-list";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 export default async function TagsPage() {
-  const data = await fetchTags()
+  const data = await fetchTags();
   return (
     <div className="space-y-6">
       <div className="w-full flex flex-row justify-between">
@@ -14,7 +14,7 @@ export default async function TagsPage() {
           </Link>
         </div>
       </div>
-      <TagList tags_data={data}/>
+      <TagList tags_data={data} />
     </div>
   );
 }
