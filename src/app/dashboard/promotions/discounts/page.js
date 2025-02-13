@@ -1,3 +1,4 @@
+import DiscountList from "@/components/dashboard/discount-list";
 import ProductList from "@/components/dashboard/list-product";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -11,8 +12,7 @@ export default async function ProductsPage() {
           <Button>Create Discount</Button>
         </Link>
       </div>
+      <DiscountList />
     </div>
   );
 }
-
-

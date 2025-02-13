@@ -2,7 +2,6 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/dist/server/api-utils";
 
 export const addCategory = async (formData) => {
   const supabase = await createClient();
