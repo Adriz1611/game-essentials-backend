@@ -326,6 +326,24 @@ export const createDiscount = async (value) => {
     })
     .select("id");
 
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  const discountId = data[0].id;
+
+  for (const productId of value.products) {
+    const { error } = await supabase
+      .from("products")
+      .update({ discount_id: discountId })
+      .eq("id", productId.id)
+      .select();
+
     if (error) {
       return {
         error: {
@@ -334,37 +352,12 @@ export const createDiscount = async (value) => {
         success: false,
       };
     }
+  }
 
-    const discountId = data[0].id;
+  revalidatePath("/dashboard/discounts");
 
-    const productUpdates = value.products.map(async (productId) => {
-      const { data, error } = await supabase
-        .from("products")
-        .update({ discount_id: discountId })
-        .eq("id", productId)
-        .select();
-
-      if (error) {
-        return {
-          error: {
-            message: "Database error: " + error.message,
-          },
-          success: false,
-        };
-      }
-
-      return {
-        data,
-        success: true,
-      };
-    });
-
-    await Promise.all(productUpdates);
-
-    revalidatePath("/dashboard/discounts");
-
-    return {
-      data,
-      success: true,
-    };
-}
+  return {
+    data,
+    success: true,
+  };
+};
