@@ -236,7 +236,7 @@ export const searchProductByName = async (productName) => {
   const { data, error } = await supabase
     .from("products")
     .select("id, name")
-    .textSearch("name", productName, {
+    .textSearch("name", `'${productName}:*'`, {
       type: "websearch",
       config: "english",
     });
@@ -310,3 +310,61 @@ export const deleteTaggedProduct = async (productId, tagId) => {
     success: true,
   };
 };
+
+export const createDiscount = async (value) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("discounts")
+    .insert({
+      name: value.name,
+      description: value.description,
+      discount_type: value.discountType,
+      discount_value: value.discountValue,
+      start_date: value.startDate,
+      end_date: value.endDate,
+      is_active: value.isActive,
+    })
+    .select("id");
+
+    if (error) {
+      return {
+        error: {
+          message: "Database error: " + error.message,
+        },
+        success: false,
+      };
+    }
+
+    const discountId = data[0].id;
+
+    const productUpdates = value.products.map(async (productId) => {
+      const { data, error } = await supabase
+        .from("products")
+        .update({ discount_id: discountId })
+        .eq("id", productId)
+        .select();
+
+      if (error) {
+        return {
+          error: {
+            message: "Database error: " + error.message,
+          },
+          success: false,
+        };
+      }
+
+      return {
+        data,
+        success: true,
+      };
+    });
+
+    await Promise.all(productUpdates);
+
+    revalidatePath("/dashboard/discounts");
+
+    return {
+      data,
+      success: true,
+    };
+}

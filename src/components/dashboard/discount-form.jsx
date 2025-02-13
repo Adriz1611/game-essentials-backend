@@ -41,6 +41,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import ProductSearch from "@/components/dashboard/product-search";
+import { createDiscount } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -50,7 +51,7 @@ const formSchema = z.object({
     message: "Description must be at least 10 characters.",
   }),
   discountType: z.enum(["percentage", "fixed"]),
-  discountValue: z.number().positive({
+  discountValue: z.coerce.number().positive({
     message: "Discount value must be a positive number.",
   }),
   startDate: z.date(),
@@ -74,16 +75,19 @@ export default function CreateDiscountForm() {
     },
   });
 
-  function onSubmit(values) {
+  async function onSubmit(values) {
     const discountData = {
       ...values,
       products: selectedProducts,
     };
-    console.log(discountData);
-    // Here you would typically send the data to your backend
-    alert("Discount created successfully!");
-
-    setSelectedProducts([]);
+      const result = await createDiscount(discountData);
+      if (result.success) {
+        form.reset();
+        setSelectedProducts([]);
+        alert("Discount created successfully!");
+      } else {
+        alert(result.error || "Failed to create discount");
+      }
   }
 
   return (
@@ -170,7 +174,6 @@ export default function CreateDiscountForm() {
                         type="number"
                         placeholder="Enter discount value"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
