@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +18,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, ArrowUpDown, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 // Mock data for discounts
 const mockDiscounts = [
@@ -44,41 +52,55 @@ const mockDiscounts = [
       { id: 4, name: "Backpack", originalPrice: 49.99 },
     ],
   },
-]
+];
 
-export default function DiscountList() {
-  const [discounts, setDiscounts] = useState(mockDiscounts)
-  const [sortConfig, setSortConfig] = useState(null)
+// Add a helper function to format ISO dates
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString();
+};
+
+export default function DiscountList({ discounts_data }) {
+  const [discounts, setDiscounts] = useState(discounts_data);
+  const [sortConfig, setSortConfig] = useState(null);
 
   const sortDiscounts = (key) => {
-    let direction = "asc"
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc"
+    let direction = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
     }
-    setSortConfig({ key, direction })
+    setSortConfig({ key, direction });
 
     setDiscounts(
       [...discounts].sort((a, b) => {
         if (a[key] < b[key]) {
-          return direction === "asc" ? -1 : 1
+          return direction === "asc" ? -1 : 1;
         }
         if (a[key] > b[key]) {
-          return direction === "asc" ? 1 : -1
+          return direction === "asc" ? 1 : -1;
         }
-        return 0
-      }),
-    )
-  }
+        return 0;
+      })
+    );
+  };
 
-  const formatPrice = (price) => `$${price.toFixed(2)}`
+  const formatPrice = (price) => `$${price.toFixed(2)}`;
 
-  const calculateDiscountedPrice = (originalPrice, discountType, discountValue) => {
+  const calculateDiscountedPrice = (
+    originalPrice,
+    discountType,
+    discountValue
+  ) => {
     if (discountType === "percentage") {
-      return originalPrice * (1 - discountValue / 100)
+      return originalPrice * (1 - discountValue / 100);
     } else {
-      return Math.max(0, originalPrice - discountValue)
+      return Math.max(0, originalPrice - discountValue);
     }
-  }
+  };
 
   return (
     <Table>
@@ -99,37 +121,32 @@ export default function DiscountList() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {discounts.map((discount) => (
+        {discounts.map((discount, index) => (
           <TableRow key={discount.id}>
-            <TableCell className="font-medium">{discount.id}</TableCell>
+            <TableCell className="font-medium">{index + 1}</TableCell>
             <TableCell>{discount.name}</TableCell>
             <TableCell>{discount.description}</TableCell>
             <TableCell>
-              {discount.discountType === "percentage"
-                ? `${discount.discountValue}%`
-                : formatPrice(discount.discountValue)}
+              {discount.discount_type === "percentage"
+                ? `${discount.discount_value}%`
+                : formatPrice(discount.discount_value)}
             </TableCell>
-            <TableCell>{`${discount.startDate} - ${discount.endDate}`}</TableCell>
             <TableCell>
-              <Badge variant={discount.isActive ? "success" : "secondary"}>
-                {discount.isActive ? "Active" : "Inactive"}
+              {`${formatDate(discount.start_date)} - ${formatDate(
+                discount.end_date
+              )}`}
+            </TableCell>
+            <TableCell>
+              <Badge variant={discount.is_active ? "success" : "secondary"}>
+                {discount.is_active ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
             <TableCell>
-              <ul>
-                {discount.products.map((product) => (
-                  <li key={product.id}>
-                    {product.name}: {formatPrice(product.originalPrice)} →{" "}
-                    {formatPrice(
-                      calculateDiscountedPrice(
-                        product.originalPrice,
-                        discount.discountType,
-                        discount.discountValue
-                      )
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <Link href={"dashboard/promotions/discounts/" + discount.id + "/products"}>
+                <Badge>
+                  View Products <ArrowRight size={15} />
+                </Badge>
+              </Link>
             </TableCell>
             <TableCell className="text-right">
               <DropdownMenu>
@@ -149,7 +166,6 @@ export default function DiscountList() {
                     Copy discount ID
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>View discount details</DropdownMenuItem>
                   <DropdownMenuItem>Edit discount</DropdownMenuItem>
                   <DropdownMenuItem>Delete discount</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -161,4 +177,3 @@ export default function DiscountList() {
     </Table>
   );
 }
-
