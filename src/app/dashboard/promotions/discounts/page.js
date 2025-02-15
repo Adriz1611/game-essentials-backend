@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default async function ProductsPage() {
+export default async function DiscountsPage() {
   const data = await fetchDiscounts()
   return (
     <div className="w-full">

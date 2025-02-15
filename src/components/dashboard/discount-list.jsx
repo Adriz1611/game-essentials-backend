@@ -137,12 +137,16 @@ export default function DiscountList({ discounts_data }) {
               )}`}
             </TableCell>
             <TableCell>
-              <Badge variant={discount.is_active ? "success" : "secondary"}>
+              <Badge variant={discount.is_active ? "success" : "destructive"}>
                 {discount.is_active ? "Active" : "Inactive"}
               </Badge>
             </TableCell>
             <TableCell>
-              <Link href={"dashboard/promotions/discounts/" + discount.id + "/products"}>
+              <Link
+                href={
+                  "discounts/" + discount.id + "/products"
+                }
+              >
                 <Badge>
                   View Products <ArrowRight size={15} />
                 </Badge>
