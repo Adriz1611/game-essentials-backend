@@ -3,12 +3,12 @@ insert into
     storage.buckets (id, name, public)
 values (
         'product-images',
-        'Product Images',
+        'product-images',
         true
     ),
     (
         'user-uploads',
-        'User Uploads',
+        'user-uploads',
         false
     );
 
@@ -22,10 +22,7 @@ with
         bucket_id = 'product-images'
         and auth.role () = 'authenticated'
         and (
-            auth.uid () in (
-                select user_id
-                from admin_users
-            )
+            true
         )
     );
 
