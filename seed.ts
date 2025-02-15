@@ -7,7 +7,7 @@
 import { createSeedClient } from "@snaplet/seed";
 
 const main = async () => {
-  const seed = await createSeedClient();
+  const seed = await createSeedClient({ dryRun: true });
 
   // Truncate all tables in the database
   await seed.$resetDatabase();
