@@ -28,7 +28,7 @@
     "lucide-react": "^0.474.0",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^9.5.1",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.54.2",
@@ -38,9 +38,14 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@snaplet/copycat": "^6.0.0",
+    "@snaplet/seed": "^0.98.0",
+    "@types/pg": "^8.11.11",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "pg": "^8.13.3",
     "postcss": "^8",
+    "postgres": "^3.4.5",
     "tailwindcss": "^3.4.1"
   }
 }
