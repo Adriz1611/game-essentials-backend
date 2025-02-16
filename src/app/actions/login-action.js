@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+
 export const loginAction = async (formData) => {
 
   const email = formData.email;
@@ -13,7 +14,8 @@ export const loginAction = async (formData) => {
   });
 
   if (error) {
-    return encodedRedirect("error", "/login", error.message);
+    console.error("Error logging in:", error.message);
+    return redirect("/login?error=" + error.message);
   }
   return redirect("/dashboard/products");
 };

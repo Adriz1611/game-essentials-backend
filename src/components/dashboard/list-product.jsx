@@ -84,7 +84,11 @@ export default function ProductList({ data }) {
             <TableCell className="font-medium">{index + 1}</TableCell>
             <TableCell>{product.name}</TableCell>
             <TableCell>{`${product.price} ${product.currency}`}</TableCell>
-            <TableCell>{product.categories.name}</TableCell>
+            <TableCell>
+              {product.categories?.name == null
+                ? "No Category"
+                : product.categories?.name}
+            </TableCell>
             <TableCell>{product.stock_quantity}</TableCell>
             <TableCell>
               <Badge variant={product.is_active ? "success" : "destructive"}>

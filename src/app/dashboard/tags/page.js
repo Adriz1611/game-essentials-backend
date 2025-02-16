@@ -10,7 +10,7 @@ export default async function TagsPage() {
         <h2 className="text-2xl font-bold mb-4">Manage Products Tags</h2>
         <div className="flex flex-row gap-5">
           <Link href={`/dashboard/tags/add`}>
-            <Button variant="outline">Create tags</Button>
+            <Button >Create tags</Button>
           </Link>
         </div>
       </div>

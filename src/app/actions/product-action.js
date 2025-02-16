@@ -82,11 +82,11 @@ export const addProduct = async (formData) => {
         price: formData.price,
         currency: formData.currency,
         stock_quantity: formData.stockQuantity,
-        category_id: formData.category,
+        category_id: formData.category === "" ? null : formData.category,
         specifications: formData.specifications,
         images: formData.images,
-        is_digital: formData.isActive,
-        is_active: formData.isDigital,
+        is_digital: formData.isDigital,
+        is_active: formData.isActive,
       },
     ])
     .select();
@@ -118,7 +118,7 @@ export const updateProduct = async (id, productData) => {
       price: productData.price,
       currency: productData.currency,
       stock_quantity: productData.stockQuantity,
-      category_id: productData.category,
+      category_id: productData.category === "" ? null : formData.category,
       specifications: productData.specifications,
       images: productData.images,
       is_digital: productData.isDigital,

@@ -40,9 +40,13 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
+  description: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters.",
+    })
+    .optional()
+    .or(z.literal("")),
   price: z.number().positive({
     message: "Price must be a positive number.",
   }),
@@ -52,9 +56,13 @@ const formSchema = z.object({
   stockQuantity: z.number().int().nonnegative({
     message: "Stock quantity must be a non-negative integer.",
   }),
-  category: z.string().min(1, {
-    message: "Please select a category.",
-  }),
+  category: z
+    .string()
+    .min(1, {
+      message: "Please select a category.",
+    })
+    .optional()
+    .or(z.literal("")),
   specifications: z.array(
     z.object({
       key: z.string().min(1, { message: "Key is required" }),
@@ -78,7 +86,7 @@ export default function ProductForm({ product_data, categories_data }) {
       name: product_data?.name || "",
       description: product_data?.description || "",
       price: product_data?.price || 0,
-      currency: product_data?.currency || "",
+      currency: product_data?.currency || "INR",
       stockQuantity: product_data?.stock_quantity || 0,
       category: product_data?.category_id || "",
       specifications: product_data?.specifications || [{ key: "", value: "" }],
