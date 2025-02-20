@@ -360,3 +360,7 @@ export const createDiscount = async (value) => {
     success: true,
   };
 };
+
+export const createCoupon = async (value) => {
+   console.log(value);
+}

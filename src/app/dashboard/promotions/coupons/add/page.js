@@ -1,4 +1,4 @@
-import CouponForm from "@/components/coupon-form";
+import CouponForm from "@/components/dashboard/coupon-form";
 
 export default function AddCouponPage() {
   return (
