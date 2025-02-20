@@ -353,7 +353,7 @@ export const createDiscount = async (value) => {
     }
   }
 
-  revalidatePath("/dashboard/discounts");
+  revalidatePath("/dashboard/promotions/discounts");
 
   return {
     data,
@@ -362,5 +362,33 @@ export const createDiscount = async (value) => {
 };
 
 export const createCoupon = async (value) => {
-   console.log(value);
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("coupons").insert([
+      {
+        code: value.code,
+        discount_type: value.discountType,
+        discount_value: value.discountValue,
+        start_date: value.startDate,
+        end_date: value.endDate,
+        user_usage: value.userUsage,
+        total_usage_limit: value.totalUsageLimit,
+        is_active: value.isActive,
+      },
+    ]);
+
+    if (error) {
+      return {
+        error: {
+          message: "Database error: " + error.message,
+        },
+        success: false,
+      };
+    }
+
+    revalidatePath("/dashboard/promotions/coupons");
+
+    return {
+      data,
+      success: true,
+    };
 }
