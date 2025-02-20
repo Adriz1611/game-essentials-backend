@@ -13,7 +13,8 @@ values (
     );
 
 -- Set up storage policies for product imagesCREATE POLICY "everyone 16wiy3a_0" ON storage.objects FOR
-SELECT TO anon, authenticated USING (bucket_id = 'product-images');
+CREATE POLICY "everyone 16wiy3a_0" ON storage.objects FOR
+SELECT USING (bucket_id = 'product-images');
 CREATE POLICY "everyone 16wiy3a_1" ON storage.objects FOR INSERT TO anon,
 authenticated
 WITH
