@@ -73,6 +73,7 @@ export default function CouponForm() {
     try {
       const couponData = {
         ...values,
+        discountValue: Number.parseInt(values.discountValue),
         userUsage: values.userUsage ? Number.parseInt(values.userUsage) : null,
         totalUsageLimit: values.totalUsageLimit
           ? Number.parseInt(values.totalUsageLimit)
