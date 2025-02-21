@@ -61,7 +61,7 @@ export default function TagList({ tags_data }) {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Existing Tags</h3>
+      
       <Table>
         <TableHeader>
           <TableRow>

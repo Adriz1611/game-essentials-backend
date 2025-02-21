@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-
+import { Badge } from "@/components/ui/badge"
 
 
 export default function CouponList({ coupons_data }) {
@@ -28,11 +28,24 @@ export default function CouponList({ coupons_data }) {
           {coupons.map((coupon) => (
             <TableRow key={coupon.id}>
               <TableCell>{coupon.code}</TableCell>
-              <TableCell>{coupon.discountValue}</TableCell>
-              <TableCell>{new Date(coupon.startDate).toLocaleDateString()}</TableCell>
-              <TableCell>{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
-              <TableCell>{coupon.userUsage ?? "Unlimited"}</TableCell>
-              <TableCell>{coupon.totalUsageLimit ?? "Unlimited"}</TableCell>
+              <TableCell>
+                {coupon.discount_type == "percentage"
+                  ? coupon.discount_value + "%"
+                  : coupon.discount_value}
+              </TableCell>
+              <TableCell>
+                {new Date(coupon.start_date).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                {new Date(coupon.end_date).toLocaleDateString()}
+              </TableCell>
+              <TableCell>{coupon.user_usage_limit ?? "Unlimited"}</TableCell>
+              <TableCell>{coupon.total_usage_limit ?? "Unlimited"}</TableCell>
+              <TableCell>
+                <Badge variant={coupon.is_active ? "success" : "destructive"}>
+                  {coupon.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <Button variant="outline" size="sm">
                   Edit
@@ -43,6 +56,6 @@ export default function CouponList({ coupons_data }) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 
