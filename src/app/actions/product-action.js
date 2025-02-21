@@ -370,7 +370,7 @@ export const createCoupon = async (value) => {
         discount_value: value.discountValue,
         start_date: value.startDate,
         end_date: value.endDate,
-        user_usage: value.userUsage,
+        user_usage_limit: value.userUsage,
         total_usage_limit: value.totalUsageLimit,
         is_active: value.isActive,
       },

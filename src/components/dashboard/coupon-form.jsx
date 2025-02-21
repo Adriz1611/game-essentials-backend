@@ -70,23 +70,23 @@ export default function CouponForm() {
 
   async function onSubmit(values) {
     setIsPending(true);
-    try {
-      const couponData = {
-        ...values,
-        discountValue: Number.parseInt(values.discountValue),
-        userUsage: values.userUsage ? Number.parseInt(values.userUsage) : null,
-        totalUsageLimit: values.totalUsageLimit
-          ? Number.parseInt(values.totalUsageLimit)
-          : null,
-      };
-      await createCoupon(couponData);
-      router.push("/dashboard/promotions/coupons");
-      router.refresh();
-    } catch (error) {
-      console.error("Failed to create coupon:", error);
-      alert("Failed to create coupon. Please try again.");
-    } finally {
+
+    const couponData = {
+      ...values,
+      discountValue: Number.parseInt(values.discountValue),
+      userUsage: values.userUsage ? Number.parseInt(values.userUsage) : null,
+      totalUsageLimit: values.totalUsageLimit
+        ? Number.parseInt(values.totalUsageLimit)
+        : null,
+    };
+    const res = await createCoupon(couponData);
+   
+    if (res.success) {
+      form.reset();
       setIsPending(false);
+      alert("Coupon created successfully!");
+    } else {
+      alert(res?.error?.message || "Failed to create Coupon");
     }
   }
 
