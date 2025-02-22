@@ -119,11 +119,11 @@ export default function SidebarLayout({ children }) {
         </Sidebar>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="flex items-center h-16 px-4 border-b bg-white">
+          <header className="flex items-center h-16 px-4 border-b ">
             <SidebarTrigger />
             <h1 className="text-2xl font-semibold ml-4">Admin Dashboard</h1>
           </header>
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto  p-4">
             {children}
           </main>
         </div>
