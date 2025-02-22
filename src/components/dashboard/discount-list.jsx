@@ -144,7 +144,7 @@ export default function DiscountList({ discounts_data }) {
             <TableCell>
               <Link
                 href={
-                  "discounts/" + discount.id + "/products"
+                  "dashboard/promotions/discounts/" + discount.id + "/products"
                 }
               >
                 <Badge>
