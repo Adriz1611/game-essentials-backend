@@ -10,6 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -26,14 +33,15 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { createCoupon } from "@/app/actions/coupon-actions";
+import { createCoupon } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   code: z.string().min(3, {
     message: "Coupon code must be at least 3 characters.",
   }),
-  discountValue: z.number().positive({
-    message: "Discount value must be a positive number.",
+  discountType: z.enum(["percentage", "fixed"]),
+  discountValue: z.string().min(1, {
+    message: "Discount value is required.",
   }),
   startDate: z.date(),
   endDate: z.date(),
@@ -46,41 +54,39 @@ export default function CouponForm() {
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  const form =
-    useForm <
-    z.infer <
-    typeof formSchema >>
-      {
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          code: "",
-          discountValue: 0,
-          startDate: new Date(),
-          endDate: new Date(),
-          userUsage: "",
-          totalUsageLimit: "",
-          isActive: true,
-        },
-      };
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      code: "",
+      discountType: "percentage",
+      discountValue: "",
+      startDate: new Date(),
+      endDate: new Date(),
+      userUsage: "",
+      totalUsageLimit: "",
+      isActive: true,
+    },
+  });
 
   async function onSubmit(values) {
     setIsPending(true);
-    try {
-      const couponData = {
-        ...values,
-        userUsage: values.userUsage ? Number.parseInt(values.userUsage) : null,
-        totalUsageLimit: values.totalUsageLimit
-          ? Number.parseInt(values.totalUsageLimit)
-          : null,
-      };
-      await createCoupon(couponData);
-      router.push("/admin/promotions/coupons");
-      router.refresh();
-    } catch (error) {
-      console.error("Failed to create coupon:", error);
-      alert("Failed to create coupon. Please try again.");
-    } finally {
+
+    const couponData = {
+      ...values,
+      discountValue: Number.parseInt(values.discountValue),
+      userUsage: values.userUsage ? Number.parseInt(values.userUsage) : null,
+      totalUsageLimit: values.totalUsageLimit
+        ? Number.parseInt(values.totalUsageLimit)
+        : null,
+    };
+    const res = await createCoupon(couponData);
+   
+    if (res.success) {
+      form.reset();
       setIsPending(false);
+      alert("Coupon created successfully!");
+    } else {
+      alert(res?.error?.message || "Failed to create Coupon");
     }
   }
 
@@ -103,6 +109,28 @@ export default function CouponForm() {
 
         <FormField
           control={form.control}
+          name="discountType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Discount Type</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select discount type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="percentage">Percentage</SelectItem>
+                  <SelectItem value="fixed">Fixed Amount</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="discountValue"
           render={({ field }) => (
             <FormItem>
@@ -112,9 +140,13 @@ export default function CouponForm() {
                   type="number"
                   placeholder="Enter discount value"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
+              <FormDescription>
+                {form.watch("discountType") === "percentage"
+                  ? "Enter percentage value (e.g., 10 for 10% off)"
+                  : "Enter fixed amount value"}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

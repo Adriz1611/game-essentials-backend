@@ -118,7 +118,7 @@ export const updateProduct = async (id, productData) => {
       price: productData.price,
       currency: productData.currency,
       stock_quantity: productData.stockQuantity,
-      category_id: productData.category === "" ? null : formData.category,
+      category_id: productData.category === "" ? null : productData.category,
       specifications: productData.specifications,
       images: productData.images,
       is_digital: productData.isDigital,
@@ -353,7 +353,39 @@ export const createDiscount = async (value) => {
     }
   }
 
-  revalidatePath("/dashboard/discounts");
+  revalidatePath("/dashboard/promotions/discounts");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const createCoupon = async (value) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("coupons").insert([
+    {
+      code: value.code,
+      discount_type: value.discountType,
+      discount_value: value.discountValue,
+      start_date: value.startDate,
+      end_date: value.endDate,
+      user_usage_limit: value.userUsage,
+      total_usage_limit: value.totalUsageLimit,
+      is_active: value.isActive,
+    },
+  ]);
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/promotions/coupons");
 
   return {
     data,
