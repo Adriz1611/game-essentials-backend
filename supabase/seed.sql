@@ -1,5 +1,7 @@
--- Insert 5 categories: two parent categories and three child categories
+-- Seed data for categories, discounts, tags, products, product_tags, and coupons
+
 WITH
+    -- Categories
     elec AS (
         INSERT INTO
             public.categories (name, description)
@@ -62,7 +64,7 @@ WITH
         RETURNING
             id
     ),
--- Insert 4 discounts with different types
+-- Discounts (5 unique discounts so each product gets a unique discount)
 disc1 AS (
     INSERT INTO
         public.discounts (
@@ -147,7 +149,28 @@ disc4 AS (
     RETURNING
         id
 ),
--- Insert 5 tags to be used for products
+disc5 AS (
+    INSERT INTO
+        public.discounts (
+            name,
+            description,
+            discount_type,
+            discount_value,
+            start_date,
+            end_date
+        )
+    VALUES (
+            'Spring Special',
+            '10% off Spring Special',
+            'percentage',
+            10.00,
+            '2025-03-01 00:00:00+00',
+            '2025-03-31 23:59:59+00'
+        )
+    RETURNING
+        id
+),
+-- Tags (5 tags)
 tag1 AS (
     INSERT INTO
         public.tags (name, description)
@@ -195,7 +218,7 @@ tag5 AS (
     RETURNING
         id
 ),
--- Insert 5 products with relationships to categories and discounts
+-- Products (5 products, each referencing a unique discount)
 prod1 AS (
     INSERT INTO
         public.products (
@@ -247,7 +270,7 @@ prod2 AS (
             ),
             (
                 SELECT id
-                FROM disc3
+                FROM disc2
             ),
             false
         )
@@ -276,7 +299,7 @@ prod3 AS (
             ),
             (
                 SELECT id
-                FROM disc2
+                FROM disc3
             ),
             false
         )
@@ -334,14 +357,14 @@ prod5 AS (
             ),
             (
                 SELECT id
-                FROM disc1
+                FROM disc5
             ),
             false
         )
     RETURNING
         id
 )
--- Establish product-to-tag relationships in the join table
+-- Insert product-to-tag relationships in the join table
 INSERT INTO
     public.product_tags (product_id, tags_id)
 VALUES (
@@ -353,7 +376,7 @@ VALUES (
             SELECT id
             FROM tag1
         )
-    ), -- Smartphone X: Featured
+    ),
     (
         (
             SELECT id
@@ -363,7 +386,7 @@ VALUES (
             SELECT id
             FROM tag5
         )
-    ), -- Smartphone X: New Arrival
+    ),
     (
         (
             SELECT id
@@ -373,7 +396,7 @@ VALUES (
             SELECT id
             FROM tag3
         )
-    ), -- Laptop Pro: Bestseller
+    ),
     (
         (
             SELECT id
@@ -383,7 +406,7 @@ VALUES (
             SELECT id
             FROM tag2
         )
-    ), -- Laptop Pro: Sale
+    ),
     (
         (
             SELECT id
@@ -393,7 +416,7 @@ VALUES (
             SELECT id
             FROM tag2
         )
-    ), -- Designer Jeans: Sale
+    ),
     (
         (
             SELECT id
@@ -403,7 +426,7 @@ VALUES (
             SELECT id
             FROM tag3
         )
-    ), -- Designer Jeans: Bestseller
+    ),
     (
         (
             SELECT id
@@ -413,7 +436,7 @@ VALUES (
             SELECT id
             FROM tag1
         )
-    ), -- Wireless Headphones: Featured
+    ),
     (
         (
             SELECT id
@@ -423,7 +446,7 @@ VALUES (
             SELECT id
             FROM tag4
         )
-    ), -- Wireless Headphones: Limited Edition
+    ),
     (
         (
             SELECT id
@@ -433,7 +456,7 @@ VALUES (
             SELECT id
             FROM tag5
         )
-    ), -- Luxury Watch: New Arrival
+    ),
     (
         (
             SELECT id
@@ -443,7 +466,7 @@ VALUES (
             SELECT id
             FROM tag4
         )
-    ), -- Luxury Watch: Limited Edition
+    ),
     (
         (
             SELECT id
@@ -454,7 +477,6 @@ VALUES (
             FROM tag3
         )
     );
--- Luxury Watch: Bestseller
 
 -- Insert 5 coupon records
 INSERT INTO
