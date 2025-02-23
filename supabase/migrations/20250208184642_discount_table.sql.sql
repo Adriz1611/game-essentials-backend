@@ -146,7 +146,7 @@ CREATE INDEX idx_orders_user ON public.orders USING btree (user_id);
 
 CREATE INDEX idx_products_category ON public.products USING btree (category_id);
 
-CREATE UNIQUE INDEX idx_products_discount_unique ON public.products USING btree (discount_id);
+CREATE INDEX idx_products_discount_unique ON public.products USING btree (discount_id);
 
 CREATE UNIQUE INDEX order_items_pkey ON public.order_items USING btree (id);
 

@@ -88,7 +88,7 @@ export default function DiscountList({ discounts_data }) {
     );
   };
 
-  const formatPrice = (price) => `$${price.toFixed(2)}`;
+  const formatPrice = (price) => `${price.toFixed(2)}`;
 
   const calculateDiscountedPrice = (
     originalPrice,
@@ -144,7 +144,7 @@ export default function DiscountList({ discounts_data }) {
             <TableCell>
               <Link
                 href={
-                  "dashboard/promotions/discounts/" + discount.id + "/products"
+                  "discounts/" + discount.id + "/products"
                 }
               >
                 <Badge>

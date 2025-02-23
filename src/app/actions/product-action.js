@@ -234,11 +234,13 @@ export const searchProductByName = async (productName) => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("products")
-    .select("id, name")
+    .select("id, name, price")
     .textSearch("name", `'${productName}:*'`, {
       type: "websearch",
       config: "english",
     });
+
+    console.log(data);
 
   if (error) {
     return {
@@ -392,3 +394,7 @@ export const createCoupon = async (value) => {
     success: true,
   };
 };
+
+export const removeProductFromDiscount = async (discountid, productId) => {}
+
+export const addProductToDiscount = async (discountid, productId) => {};
