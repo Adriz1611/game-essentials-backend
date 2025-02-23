@@ -240,8 +240,6 @@ export const searchProductByName = async (productName) => {
       config: "english",
     });
 
-    console.log(data);
-
   if (error) {
     return {
       error: {
@@ -363,6 +361,61 @@ export const createDiscount = async (value) => {
   };
 };
 
+export const addProductToDiscount = async (discountId, productId) => {
+  const supabase = await createClient();
+
+  console.log(discountId + "------ " + productId);
+  const { data, error } = await supabase
+    .from("products")
+    .update({ discount_id: discountId })
+    .eq("id", productId)
+    .select();
+
+  if (error) {
+    console.log("error", error);
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath(
+    "/dashboard/promotions/discounts/" + discountId + "/products"
+  );
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const removeProductFromDiscount = async (discountid, productId) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .update({ discount_id: null })
+    .eq("id", productId)
+    .select();
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/promotions/discounts/" + discountid + "/products");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
 export const createCoupon = async (value) => {
   const supabase = await createClient();
   const { data, error } = await supabase.from("coupons").insert([
@@ -394,7 +447,3 @@ export const createCoupon = async (value) => {
     success: true,
   };
 };
-
-export const removeProductFromDiscount = async (discountid, productId) => {}
-
-export const addProductToDiscount = async (discountid, productId) => {};

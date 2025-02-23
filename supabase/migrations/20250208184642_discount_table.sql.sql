@@ -106,7 +106,7 @@ create table "public"."products" (
     "currency" text default 'INR'::text,
     "stock_quantity" integer not null default 0,
     "category_id" uuid,
-    "images" text[],
+    "images" text[] null default '{}'::text [] ,
     "specifications" jsonb,
     "is_digital" boolean default false,
     "is_active" boolean default true,
