@@ -74,19 +74,28 @@ export default function CustomerList({ customers }) {
   const [statusFilter, setStatusFilter] = useState("");
   const router = useRouter();
 
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesFilter =
-      customer.first_name.toLowerCase().includes(filterText.toLowerCase()) ||
-      customer.last_name.toLowerCase().includes(filterText.toLowerCase()) ||
-      customer.email.toLowerCase().includes(filterText.toLowerCase())
+  const filteredCustomers =
+    Array.isArray(customers) && customers.length > 0
+      ? customers.filter((customer) => {
+          const fullName =
+            customer.first_name || customer.last_name
+              ? `${customer.first_name || ""} ${
+                  customer.last_name || ""
+                }`.trim()
+              : "Not set";
 
-    const matchesStatus =
-      statusFilter === "all" || !statusFilter
-        ? true
-        : customer.status === statusFilter;
+          const matchesFilter =
+            fullName.toLowerCase().includes(filterText.toLowerCase()) ||
+            customer.email.toLowerCase().includes(filterText.toLowerCase());
 
-    return matchesFilter && matchesStatus;
-  });
+          const matchesStatus =
+            statusFilter === "all" || !statusFilter
+              ? true
+              : customer.status === statusFilter;
+
+          return matchesFilter && matchesStatus;
+        })
+      : [];
 
   console.log(customers);
 
@@ -121,8 +130,6 @@ export default function CustomerList({ customers }) {
     }
   };
 
-
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -148,104 +155,114 @@ export default function CustomerList({ customers }) {
         </div>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={
-                    selectedCustomers.length === filteredCustomers.length &&
-                    filteredCustomers.length > 0
-                  }
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone Number</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow key={customer.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedCustomers.includes(customer.id)}
-                    onCheckedChange={() => toggleCustomer(customer.id)}
-                  />
-                </TableCell>
-                <TableCell>{`${customer.first_name} ${customer.last_name}`}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.phone}</TableCell>
-                <TableCell>
-                  <Badge
-                    className={getStatusColor(customer.customer_status)}
-                    variant="secondary"
-                  >
-                    {customer.customer_status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>View details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit customer</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
-                        Delete customer
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      {filteredCustomers.length === 0 ? (
+        <div className="p-4 text-center">No Records</div>
+      ) : (
+        <>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">
+                    <Checkbox
+                      checked={
+                        selectedCustomers.length === filteredCustomers.length &&
+                        filteredCustomers.length > 0
+                      }
+                      onCheckedChange={toggleAll}
+                    />
+                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone Number</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-[70px]"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.map((customer) => (
+                  <TableRow key={customer.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedCustomers.includes(customer.id)}
+                        onCheckedChange={() => toggleCustomer(customer.id)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {customer.first_name || customer.last_name
+                        ? `${customer.first_name || ""} ${customer.last_name || ""}`.trim()
+                        : "Not set"}
+                    </TableCell>
+                    <TableCell>{customer.email}</TableCell>
+                    <TableCell>{customer.phone ? customer.phone : "Not set"}</TableCell>
+                    <TableCell>
+                      <Badge
+                        className={getStatusColor(customer.customer_status)}
+                        variant="secondary"
+                      >
+                        {customer.customer_status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>View details</DropdownMenuItem>
+                          <DropdownMenuItem>Edit customer</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600">
+                            Delete customer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {selectedCustomers.length} of {filteredCustomers.length} row(s)
-          selected.
-        </p>
-        <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
-            <Select defaultValue="10">
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder="10" />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {selectedCustomers.length} of {filteredCustomers.length} row(s)
+              selected.
+            </p>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">Rows per page</p>
+                <Select defaultValue="10">
+                  <SelectTrigger className="h-8 w-[70px]">
+                    <SelectValue placeholder="10" />
+                  </SelectTrigger>
+                  <SelectContent side="top">
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                Page 1 of 1
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" className="h-8 w-8 p-0" disabled>
+                  {"<"}
+                </Button>
+                <Button variant="outline" className="h-8 w-8 p-0" disabled>
+                  {">"}
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page 1 of 1
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" className="h-8 w-8 p-0" disabled>
-              {"<"}
-            </Button>
-            <Button variant="outline" className="h-8 w-8 p-0" disabled>
-              {">"}
-            </Button>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
