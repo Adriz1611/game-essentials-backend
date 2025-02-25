@@ -46,3 +46,36 @@ export async function uploadProductImages(files, productId) {
     return { imageUrls: [], error };
   }
 }
+
+export async function uploadHeroImage(file, type) {
+  try {
+    if (!file) return { imageUrl: null, error: null };
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${type}/${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${fileExt}`;
+    const filePath = `hero/${fileName}`;
+
+    // Upload the file to Supabase storage
+    const { data, error } = await supabase.storage
+      .from("hero-images") // Your bucket name
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) {
+      throw error;
+    }
+    
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("hero-images").getPublicUrl(filePath);
+
+    return { imageUrl: publicUrl, error: null };
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return { imageUrl: null, error };
+  }
+}
