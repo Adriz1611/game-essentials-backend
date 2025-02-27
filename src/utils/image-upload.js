@@ -68,10 +68,12 @@ export async function uploadHeroImage(file, type) {
     if (error) {
       throw error;
     }
-    
+
     const {
       data: { publicUrl },
     } = supabase.storage.from("hero-images").getPublicUrl(filePath);
+
+    console.log("Public URL:", publicUrl, " Error ", error);
 
     return { imageUrl: publicUrl, error: null };
   } catch (error) {

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useDropzone } from "react-dropzone";
+import { uploadHeroImage } from "@/utils/image-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,56 +18,92 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { MultiSelect } from "@/components/ui/multi-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
+// Remove heroImage validation rules from the schema: make it optional without URL check.
 const formSchema = z.object({
-  heroImage: z.string().url().min(1, { message: "Hero image URL is required" }),
+  heroImage: z.string().optional(),
   heroLink: z.string().url().min(1, { message: "Hero link URL is required" }),
   categories: z
     .array(z.string())
     .min(1, { message: "At least one category must be selected" }),
 });
 
-const categories = [
-  { label: "Electronics", value: "electronics" },
-  { label: "Clothing", value: "clothing" },
-  { label: "Books", value: "books" },
-  { label: "Home & Garden", value: "home-garden" },
-  { label: "Toys", value: "toys" },
-];
-
-export function SettingsForm({ siteType }) {
+export function SettingsForm({ siteType, categories_data }) {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
 
-  const form =
-    useForm (
-      {
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-          heroImage: "",
-          heroLink: "",
-          categories: [],
-        },
-      });
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      heroImage: "",
+      heroLink: "",
+      categories: [],
+    },
+  });
 
   async function onSubmit(values) {
-    console.log(values);
-    // Here you would typically send the data to your backend
+    let finalImageUrl = values.heroImage;
+    // Upload image if a new file was dropped
+    if (uploadedFile) {
+      setIsUploading(true);
+      const { imageUrl, error } = await uploadHeroImage(uploadedFile, siteType);
+      if (error) {
+        console.error("Error uploading hero image:", error);
+        setIsUploading(false);
+        return;
+      }
+      finalImageUrl = imageUrl;
+    }
+    // Manual validation: ask for URL before submission
+    if (!finalImageUrl) {
+      alert("Hero image URL is required");
+      setIsUploading(false);
+      return;
+    }
+    const updatedValues = { ...values, heroImage: finalImageUrl };
+    console.log(updatedValues);
     alert(`Settings for ${siteType} site updated successfully!`);
+    setIsUploading(false);
   }
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
-      // Simulating file upload
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // In a real application, you would upload the file to your server or a cloud storage service
-      // and get back the URL of the uploaded image
-      const fakeUploadedUrl = URL.createObjectURL(file);
-      form.setValue("heroImage", fakeUploadedUrl);
-      setIsUploading(false);
+  // Just store the file on drop without uploading
+  const onDrop = (acceptedFiles) => {
+    if (acceptedFiles && acceptedFiles[0]) {
+      const file = acceptedFiles[0];
+      setUploadedFile(file);
+      setUploadedFileName(file.name);
     }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [] },
+    multiple: false,
+  });
+
+  const addCategory = (category) => {
+    const currentCategories = form.getValues("categories");
+    if (!currentCategories.includes(category)) {
+      form.setValue("categories", [...currentCategories, category]);
+    }
+  };
+
+  const removeCategory = (category) => {
+    const currentCategories = form.getValues("categories");
+    form.setValue(
+      "categories",
+      currentCategories.filter((c) => c !== category)
+    );
   };
 
   return (
@@ -80,18 +118,21 @@ export function SettingsForm({ siteType }) {
                 <FormItem>
                   <FormLabel>Hero Image</FormLabel>
                   <FormControl>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        {...field}
-                        placeholder="Enter image URL or upload"
-                      />
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="w-full max-w-xs"
-                        disabled={isUploading}
-                      />
+                    <div
+                      {...getRootProps()}
+                      className="border-2 border-dashed rounded-md p-4 cursor-pointer flex items-center space-x-2"
+                    >
+                      <input {...getInputProps()} />
+                      {isDragActive ? (
+                        <p>Drop the image here ...</p>
+                      ) : (
+                        <p>Drag & drop an image here, or click to select</p>
+                      )}
+                      {uploadedFileName && (
+                        <span className="text-sm text-muted-foreground">
+                          {uploadedFileName}
+                        </span>
+                      )}
                     </div>
                   </FormControl>
                   <FormDescription>
@@ -102,7 +143,6 @@ export function SettingsForm({ siteType }) {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="heroLink"
@@ -119,7 +159,6 @@ export function SettingsForm({ siteType }) {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="categories"
@@ -127,12 +166,38 @@ export function SettingsForm({ siteType }) {
                 <FormItem>
                   <FormLabel>Categories</FormLabel>
                   <FormControl>
-                    <MultiSelect
-                      options={categories}
-                      selected={field.value}
-                      onChange={field.onChange}
-                      placeholder="Select categories"
-                    />
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        {field.value.map((category) => (
+                          <Badge key={category} variant="success">
+                            {
+                              categories_data.find((c) => c.id === category)
+                                ?.name
+                            }
+                            <button
+                              type="button"
+                              onClick={() => removeCategory(category)}
+                              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            >
+                              <X className="h-3 w-3" />
+                              <span className="sr-only">Remove</span>
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                      <Select onValueChange={addCategory}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories_data.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </FormControl>
                   <FormDescription>
                     Select the categories to display in the sub-navbar.
@@ -141,7 +206,6 @@ export function SettingsForm({ siteType }) {
                 </FormItem>
               )}
             />
-
             <Button type="submit" disabled={isUploading}>
               {isUploading ? "Uploading..." : "Save Settings"}
             </Button>
