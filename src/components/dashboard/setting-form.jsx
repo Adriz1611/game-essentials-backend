@@ -27,8 +27,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { configureSettings } from "@/app/actions/setting-action";
 
-// Remove heroImage validation rules from the schema: make it optional without URL check.
 const formSchema = z.object({
   heroImage: z.string().optional(),
   heroLink: z.string().url().min(1, { message: "Hero link URL is required" }),
@@ -53,7 +53,6 @@ export function SettingsForm({ siteType, categories_data }) {
 
   async function onSubmit(values) {
     let finalImageUrl = values.heroImage;
-    // Upload image if a new file was dropped
     if (uploadedFile) {
       setIsUploading(true);
       const { imageUrl, error } = await uploadHeroImage(uploadedFile, siteType);
@@ -64,19 +63,26 @@ export function SettingsForm({ siteType, categories_data }) {
       }
       finalImageUrl = imageUrl;
     }
-    // Manual validation: ask for URL before submission
     if (!finalImageUrl) {
       alert("Hero image URL is required");
       setIsUploading(false);
       return;
     }
-    const updatedValues = { ...values, heroImage: finalImageUrl };
-    console.log(updatedValues);
+    const updatedValues = {
+      ...values,
+      heroImage: finalImageUrl,
+      site_type: siteType,
+    };
+    const res = await configureSettings(updatedValues);
+    if (!res.success) {
+      alert(res?.error?.message);
+      setIsUploading(false);
+      return;
+    }
     alert(`Settings for ${siteType} site updated successfully!`);
     setIsUploading(false);
   }
 
-  // Just store the file on drop without uploading
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
       const file = acceptedFiles[0];
