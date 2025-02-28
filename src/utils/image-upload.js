@@ -47,14 +47,14 @@ export async function uploadProductImages(files, productId) {
   }
 }
 
-export async function uploadHeroImage(file, type) {
+export async function uploadHeroImage(file, type, finalImageUrl = null) {
   try {
     if (!file) return { imageUrl: null, error: null };
 
     const fileExt = file.name.split(".").pop();
-    const fileName = `${type}/${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(2)}.${fileExt}`;
+    const fileName = finalImageUrl 
+      ? `${type}/${finalImageUrl}` 
+      : `${type}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `hero/${fileName}`;
 
     // Upload the file to Supabase storage
@@ -72,8 +72,6 @@ export async function uploadHeroImage(file, type) {
     const {
       data: { publicUrl },
     } = supabase.storage.from("hero-images").getPublicUrl(filePath);
-
-    console.log("Public URL:", publicUrl, " Error ", error);
 
     return { imageUrl: publicUrl, error: null };
   } catch (error) {

@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -37,7 +36,7 @@ const formSchema = z.object({
     .min(1, { message: "At least one category must be selected" }),
 });
 
-export function SettingsForm({ siteType, categories_data }) {
+export function SettingsForm({ siteType, categories_data, settings_data }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -45,17 +44,34 @@ export function SettingsForm({ siteType, categories_data }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      heroImage: "",
-      heroLink: "",
-      categories: [],
+      heroImage: settings_data?.hero_image_url || "",
+      heroLink: settings_data?.hero_redirect_url || "",
+      categories: settings_data?.sub_navigation_categories || [],
     },
   });
 
+  // Pre-fill file name from existing settings (if heroImage exists)
+  useEffect(() => {
+    if (settings_data?.hero_image_url) {
+      const parts = settings_data.hero_image_url.split("/");
+      setUploadedFileName(parts[parts.length - 1]);
+    }
+  }, [settings_data]);
+
   async function onSubmit(values) {
     let finalImageUrl = values.heroImage;
+    const lastSlashIndex = finalImageUrl.lastIndexOf("/");
+    console.log("values", finalImageUrl.slice(lastSlashIndex + 1));
+    console.log("current", uploadedFileName);
     if (uploadedFile) {
       setIsUploading(true);
-      const { imageUrl, error } = await uploadHeroImage(uploadedFile, siteType);
+      const { imageUrl, error } = await uploadHeroImage(
+        uploadedFile,
+        siteType,
+        uploadedFileName !== finalImageUrl.slice(lastSlashIndex + 1)
+          ? finalImageUrl.slice(lastSlashIndex + 1)
+          : null
+      );
       if (error) {
         console.error("Error uploading hero image:", error);
         setIsUploading(false);
@@ -72,6 +88,7 @@ export function SettingsForm({ siteType, categories_data }) {
       ...values,
       heroImage: finalImageUrl,
       site_type: siteType,
+      settings_id: settings_data?.id, // Send settings id if present to enable update
     };
     const res = await configureSettings(updatedValues);
     if (!res.success) {
@@ -83,6 +100,7 @@ export function SettingsForm({ siteType, categories_data }) {
     setIsUploading(false);
   }
 
+  // Just store the file on drop
   const onDrop = (acceptedFiles) => {
     if (acceptedFiles && acceptedFiles[0]) {
       const file = acceptedFiles[0];
@@ -149,6 +167,7 @@ export function SettingsForm({ siteType, categories_data }) {
                 </FormItem>
               )}
             />
+            {/* ...existing heroLink and categories fields... */}
             <FormField
               control={form.control}
               name="heroLink"
