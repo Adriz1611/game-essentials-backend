@@ -88,7 +88,7 @@ export function SettingsForm({ siteType, categories_data, settings_data }) {
       ...values,
       heroImage: finalImageUrl,
       site_type: siteType,
-      settings_id: settings_data?.id, // Send settings id if present to enable update
+      settings_id: settings_data?.id,
     };
     const res = await configureSettings(updatedValues);
     if (!res.success) {

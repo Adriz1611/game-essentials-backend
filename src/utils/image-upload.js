@@ -57,9 +57,8 @@ export async function uploadHeroImage(file, type, finalImageUrl = null) {
       : `${type}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `hero/${fileName}`;
 
-    // Upload the file to Supabase storage
     const { data, error } = await supabase.storage
-      .from("hero-images") // Your bucket name
+      .from("hero-images") 
       .upload(filePath, file, {
         cacheControl: "3600",
         upsert: true,
