@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,52 +18,62 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MoreHorizontal, ArrowUpDown, Search } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MoreHorizontal, ArrowUpDown, Search } from "lucide-react";
+import Link from "next/link";
 
-
-export default function ShippingMethodList() {
-  const [shippingMethods, setShippingMethods] = useState(mockShippingMethods)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [sortConfig, setSortConfig] = useState(null)
-
-
+export default function ShippingMethodList({ shipping_data }) {
+  const [shippingMethods, setShippingMethods] = useState(shipping_data);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortConfig, setSortConfig] = useState(null);
 
   const sortMethods = (key) => {
-    let direction = "asc"
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc"
+    let direction = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
     }
-    setSortConfig({ key, direction })
+    setSortConfig({ key, direction });
 
     setShippingMethods(
       [...shippingMethods].sort((a, b) => {
         if (a[key] < b[key]) {
-          return direction === "asc" ? -1 : 1
+          return direction === "asc" ? -1 : 1;
         }
         if (a[key] > b[key]) {
-          return direction === "asc" ? 1 : -1
+          return direction === "asc" ? 1 : -1;
         }
-        return 0
-      }),
-    )
-  }
+        return 0;
+      })
+    );
+  };
 
   const filteredMethods = shippingMethods.filter((method) => {
-    const matchesSearch = method.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = method.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesStatus =
       statusFilter === "all" ||
-      (statusFilter === "active" && method.isActive) ||
-      (statusFilter === "inactive" && !method.isActive)
-    return matchesSearch && matchesStatus
-  })
+      (statusFilter === "active" && method.is_active) ||
+      (statusFilter === "inactive" && !method.is_active);
+    return matchesSearch && matchesStatus;
+  });
 
   const formatCurrency = (amount) => {
-    return amount === 0 ? "Free" : `${amount.toFixed(2)}`
-  }
+    return amount === 0 ? "Free" : `${amount.toFixed(2)}`;
+  };
 
   return (
     <div className="space-y-4">
@@ -133,15 +150,15 @@ export default function ShippingMethodList() {
             ) : (
               filteredMethods.map((method) => (
                 <TableRow key={method.id}>
-                  <TableCell className="font-medium">{method.name}</TableCell>
+                  <TableCell className="pl-4">{method.name}</TableCell>
                   <TableCell>{formatCurrency(method.cost)}</TableCell>
-                  <TableCell>{method.estimatedDelivery}</TableCell>
+                  <TableCell>{method.estimated_delivery_days}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Badge
-                        variant={method.isActive ? "success" : "destructive"}
+                        variant={method.is_active ? "success" : "destructive"}
                       >
-                        {method.isActive ? "Active" : "Inactive"}
+                        {method.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
                   </TableCell>
@@ -163,7 +180,11 @@ export default function ShippingMethodList() {
                           Copy ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <Link
+                          href={`/dashboard/shipping/` + method.id.toString()}
+                        >
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem className="text-destructive">
                           Delete
                         </DropdownMenuItem>
@@ -179,4 +200,3 @@ export default function ShippingMethodList() {
     </div>
   );
 }
-

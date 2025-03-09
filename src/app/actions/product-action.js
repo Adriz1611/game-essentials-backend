@@ -381,9 +381,7 @@ export const addProductToDiscount = async (discountId, productId) => {
     };
   }
 
-  revalidatePath(
-    "/dashboard/promotions/discounts/" + discountId + "/products"
-  );
+  revalidatePath("/dashboard/promotions/discounts/" + discountId + "/products");
   return {
     data,
     success: true,
@@ -441,6 +439,67 @@ export const createCoupon = async (value) => {
   }
 
   revalidatePath("/dashboard/promotions/coupons");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const addShippingMethod = async (formData) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("shipping")
+    .insert([
+      {
+        name: formData.name,
+        cost: formData.cost,
+        estimated_delivery_days: formData.estimatedDelivery,
+        is_active: formData.isActive,
+      },
+    ])
+    .select();
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/shipping");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const updateShippingMethod = async (formData, id) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("shipping")
+    .update({
+      name: formData.name,
+      cost: formData.cost,
+      estimated_delivery_days: formData.estimatedDelivery,
+      is_active: formData.isActive,
+    })
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    return {
+      error: {
+        message: "Database error: " + error.message,
+      },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/shipping");
 
   return {
     data,

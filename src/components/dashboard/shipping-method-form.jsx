@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { addShippingMethod, updateShippingMethod } from "@/app/actions/product-action";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -39,16 +39,17 @@ const formSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-export default function ShippingMethodForm() {
+export default function ShippingMethodForm({ shipping_data }) {
+  console.log(shipping_data.name);
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      cost: 0,
-      estimatedDelivery: "",
-      isActive: true,
+      name: shipping_data?.name || "",
+      cost: shipping_data?.cost || 0,
+      estimatedDelivery: shipping_data?.estimated_delivery_days || "",
+      isActive: shipping_data?.is_active || true,
     },
   });
 
@@ -56,16 +57,34 @@ export default function ShippingMethodForm() {
     setIsPending(true);
     console.log(values);
 
-    console.error("Failed to create shipping method:", error);
-    alert("Failed to create shipping method. Please try again.");
+    let res;
+    if (shipping_data) {
+      res = await updateShippingMethod(values, shipping_data.id);
+    } else {
+      res = await addShippingMethod(values);
+    }
+    setIsPending(false);
+    if (res.success) {
+      alert(
+        shipping_data
+          ? "Shipping method updated successfully!"
+          : "Shipping method added successfully!"
+      );
+    } else {
+      alert(res.error?.message);
+    }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Shipping Method Details</CardTitle>
+        <CardTitle>
+          {shipping_data ? "Update Shipping Method" : "Add Shipping Method"}
+        </CardTitle>
         <CardDescription>
-          Add a new shipping method for your store.
+          {shipping_data 
+            ? "Update existing shipping method details." 
+            : "Add a new shipping method for your store."}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +116,6 @@ export default function ShippingMethodForm() {
                   <FormLabel>Cost</FormLabel>
                   <FormControl>
                     <div className="relative">
-
                       <Input
                         type="number"
                         step="0.01"
@@ -163,7 +181,7 @@ export default function ShippingMethodForm() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Saving..." : "Save Shipping Method"}
+                {isPending ? "Saving..." : shipping_data ? "Update Shipping Method" : "Save Shipping Method"}
               </Button>
             </div>
           </form>

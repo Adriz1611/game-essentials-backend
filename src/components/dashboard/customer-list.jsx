@@ -31,42 +31,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 
-// Mock data
-// const customers = [
-//   {
-//     id: 1,
-//     username: "loyce.littel27",
-//     firstName: "Loyce",
-//     lastName: "Littel",
-//     email: "loyce_rice@gmail.com",
-//     phone: "+16333604734",
-//     dateOfBirth: "1990-05-15",
-//     status: "suspended",
-//     role: "Cashier",
-//   },
-//   {
-//     id: 2,
-//     username: "myrtie.dare28",
-//     firstName: "Myrtie",
-//     lastName: "Dare",
-//     email: "myrtie78@hotmail.com",
-//     phone: "+14705221545",
-//     dateOfBirth: "1988-12-01",
-//     status: "active",
-//     role: "Admin",
-//   },
-//   {
-//     id: 3,
-//     username: "durward.lemke92",
-//     firstName: "Durward",
-//     lastName: "Lemke",
-//     email: "durward_witting@hotmail.com",
-//     phone: "+17409712180",
-//     dateOfBirth: "1995-03-20",
-//     status: "active",
-//     role: "Superadmin",
-//   },
-// ];
+
 
 export default function CustomerList({ customers }) {
   const [selectedCustomers, setSelectedCustomers] = useState([]);

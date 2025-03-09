@@ -1,8 +1,9 @@
 import ShippingMethodList from "@/components/dashboard/shipping-method-list";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-export default function ShippingPage() {
+import { createClient } from "@/utils/supabase/server";
+export default async function ShippingPage() {
+  const data = await fetchShippingMethods();
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -16,7 +17,17 @@ export default function ShippingPage() {
           <Button>Add Shipping Method</Button>
         </Link>
       </div>
-      <ShippingMethodList />
+      <ShippingMethodList shipping_data={data}/>
     </div>
   );
+}
+
+async function fetchShippingMethods() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("shipping").select("*");
+  if (error) {
+    console.error("Error fetching shipping methods:", error);
+    return [];
+  }
+  return data;
 }
