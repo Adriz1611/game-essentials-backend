@@ -16,44 +16,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MoreHorizontal, ArrowUpDown, Search } from "lucide-react"
 
-// Mock data for shipping methods
-const mockShippingMethods = [
-  {
-    id: 1,
-    name: "Standard Shipping",
-    cost: 5.99,
-    estimatedDelivery: "3-5 business days",
-    isActive: true,
-  },
-  {
-    id: 2,
-    name: "Express Shipping",
-    cost: 15.99,
-    estimatedDelivery: "1-2 business days",
-    isActive: true,
-  },
-  {
-    id: 3,
-    name: "Next Day Delivery",
-    cost: 25.99,
-    estimatedDelivery: "Next business day",
-    isActive: true,
-  },
-  {
-    id: 4,
-    name: "International Shipping",
-    cost: 35.99,
-    estimatedDelivery: "7-14 business days",
-    isActive: false,
-  },
-  {
-    id: 5,
-    name: "Free Local Pickup",
-    cost: 0,
-    estimatedDelivery: "Same day",
-    isActive: true,
-  },
-]
 
 export default function ShippingMethodList() {
   const [shippingMethods, setShippingMethods] = useState(mockShippingMethods)

@@ -534,3 +534,13 @@ VALUES (
         3,
         200
     );
+
+INSERT INTO
+    public.shipping (
+        name,
+        cost,
+        estimated_delivery_days,
+        is_active
+    )
+VALUES ('Standard', 0, 5, true),
+    ('Express', 199, 2, false);
