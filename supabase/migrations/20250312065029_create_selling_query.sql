@@ -1,3 +1,10 @@
+CREATE TYPE negotiation_status AS ENUM(
+    'pending', -- Negotiation started, awaiting action
+    'countered', -- A counteroffer has been made
+    'accepted', -- The current offer has been accepted
+    'rejected', -- The offer or counteroffer has been rejected
+    'finalized' -- Negotiation completed and finalized
+);
 CREATE TABLE public.selling_product_queries (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4 (),
     selling_product_id UUID NOT NULL, -- Reference to the selling_products record
