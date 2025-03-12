@@ -10,7 +10,7 @@ CREATE TYPE product_quality AS ENUM(
 );
 
 -- 2. Create the user_products table using the simplified enum types
-CREATE TABLE public.user_products (
+CREATE TABLE public.selling_products (
     id UUID NOT NULL DEFAULT extensions.uuid_generate_v4 (),
     seller_id UUID NOT NULL, -- ID of the seller, referenced from customers table
     name TEXT NOT NULL,
@@ -27,5 +27,5 @@ CREATE TABLE public.user_products (
 );
 
 -- 3. Add a foreign key constraint linking seller_id to customers table
-ALTER TABLE public.user_products
-ADD CONSTRAINT user_products_seller_fkey FOREIGN KEY (seller_id) REFERENCES public.customers (id) ON DELETE CASCADE;
+ALTER TABLE public.selling_products
+ADD CONSTRAINT selling_products_seller_fkey FOREIGN KEY (seller_id) REFERENCES public.customers (id) ON DELETE CASCADE;
