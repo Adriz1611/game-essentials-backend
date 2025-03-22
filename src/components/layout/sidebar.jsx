@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ChevronRight, ChevronDown,  Package, Percent, Settings, Users, Layers2, ShoppingCart, TagIcon, Truck } from "lucide-react";
+import { LayoutDashboard, ChevronRight, ChevronDown,  Package, Percent, Settings, Users, Layers2, ShoppingCart, TagIcon, Truck, RefreshCw, LucideMessageCircleQuestion } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,6 +25,26 @@ const navItems = [
   { title: "Categories", href: "/dashboard/categories", icon: Layers2 },
   { title: "Tags", href: "/dashboard/tags", icon: TagIcon },
   { title: "Shipping", href: "/dashboard/shipping", icon: Truck },
+
+  { title: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
+  { title: "Customers", href: "/dashboard/customers", icon: Users },
+  {
+    title: "Selling",
+    href: "#",
+    icon: RefreshCw,
+    submenu: [
+      {
+        title: "Selling Products",
+        href: "/dashboard/promotions/discounts",
+        icon: Package,
+      },
+      {
+        title: "Selling Queries",
+        href: "/dashboard/sellings/queries",
+        icon: LucideMessageCircleQuestion,
+      },
+    ],
+  },
   {
     title: "Promotions",
     href: "#",
@@ -42,8 +62,6 @@ const navItems = [
       },
     ],
   },
-  { title: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
-  { title: "Customers", href: "/dashboard/customers", icon: Users },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
