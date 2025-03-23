@@ -91,7 +91,6 @@ const mockQueries = [
 ]
 
 
-
 export default function SellingQueriesList() {
   const [queries, setQueries] = useState(mockQueries)
   const [searchQuery, setSearchQuery] = useState("")
@@ -102,6 +101,7 @@ export default function SellingQueriesList() {
   const [isRespondOpen, setIsRespondOpen] = useState(false)
   const [responseRemarks, setResponseRemarks] = useState("")
   const [responseStatus, setResponseStatus] = useState("pending")
+  const [responseNegotiationPrice, setResponseNegotiationPrice] = useState(0)
 
   const sortQueries = (key) => {
     let direction = "asc"
@@ -184,6 +184,7 @@ export default function SellingQueriesList() {
     setSelectedQuery(query)
     setResponseStatus(query.status)
     setResponseRemarks(query.remarks)
+    setResponseNegotiationPrice(query.negotiation_price)
     setIsRespondOpen(true)
   }
 
@@ -196,6 +197,7 @@ export default function SellingQueriesList() {
             ...query,
             status: responseStatus,
             remarks: responseRemarks,
+            negotiation_price: responseNegotiationPrice,
             updated_at: new Date().toISOString(),
           }
         : query,
@@ -462,6 +464,26 @@ export default function SellingQueriesList() {
                     <SelectItem value="completed">Mark as Completed</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Negotiation Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5">$</span>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="pl-7"
+                    value={responseNegotiationPrice}
+                    onChange={(e) => setResponseNegotiationPrice(Number(e.target.value))}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {responseStatus === "negotiating"
+                    ? "Enter your counter-offer price"
+                    : "Adjust the final negotiated price"}
+                </p>
               </div>
 
               <div className="space-y-2">
