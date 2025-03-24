@@ -286,7 +286,7 @@ export default function SellingProductsList() {
                   <TableCell>{getQualityBadge(product.quality)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Link href={`/admin/selling-products/${product.id}`}>
+                      {/* <Link href={`/admin/selling-products/${product.id}`}>
                         <Button variant="ghost" size="icon">
                           <Eye className="h-4 w-4" />
                           <span className="sr-only">View</span>
@@ -297,7 +297,7 @@ export default function SellingProductsList() {
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
-                      </Link>
+                      </Link> */}
                       <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)}>
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">Delete</span>
