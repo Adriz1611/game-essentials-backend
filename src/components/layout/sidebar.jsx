@@ -35,7 +35,7 @@ const navItems = [
     submenu: [
       {
         title: "Selling Products",
-        href: "/dashboard/promotions/discounts",
+        href: "/dashboard/sellings/products",
         icon: Package,
       },
       {
