@@ -220,10 +220,6 @@ alter table "public"."order_items" add constraint "order_items_product_id_fkey" 
 
 alter table "public"."order_items" validate constraint "order_items_product_id_fkey";
 
-alter table "public"."orders" add constraint "orders_billing_address_fkey" FOREIGN KEY (billing_address) REFERENCES customer_addresses(id) ON UPDATE CASCADE ON DELETE SET NULL not valid;
-
-alter table "public"."orders" validate constraint "orders_billing_address_fkey";
-
 alter table "public"."orders" add constraint "orders_shipping_address_fkey" FOREIGN KEY (shipping_address) REFERENCES customer_addresses(id) ON UPDATE CASCADE ON DELETE SET NULL not valid;
 
 alter table "public"."orders" validate constraint "orders_shipping_address_fkey";
