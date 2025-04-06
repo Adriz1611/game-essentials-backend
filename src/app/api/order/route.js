@@ -2,7 +2,9 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req) {
   const supabase = await createClient();
-
+  const { shipping_address } = await req.json();
+  console.log(shipping_address);
+  let subtotal = 0;
   // check user login
   const {
     data: { user },
@@ -14,7 +16,7 @@ export async function POST(req) {
   }
 
   const { data: cartItems, error: cartError } = await supabase
-    .from("cart")
+    .from("cart_items")
     .select("id, product_id, quantity")
     .eq("user_id", user.id);
 
@@ -29,8 +31,6 @@ export async function POST(req) {
       status: 400,
     });
   }
-
-  let orderTotal = 0;
 
   const orderItems = [];
 
@@ -90,8 +90,8 @@ export async function POST(req) {
     orderItems.push({
       product_id: product.id,
       quantity: item.quantity,
-      unit_price: unitPrice,
-      total_price: finalUnitPrice,
+      unit_price: finalUnitPrice,
+      total_price: subtotal,
     });
   }
 
@@ -102,7 +102,12 @@ export async function POST(req) {
     .limit(1)
     .single();
   if (shipError || !defaultShipping) {
-    return res.status(400).json({ error: "Default shipping method not found" });
+    return new Response(
+      JSON.stringify({ error: "Shipping method not found" }),
+      {
+        status: 400,
+      }
+    );
   }
   const shippingCost = parseFloat(defaultShipping.cost);
 
@@ -114,13 +119,15 @@ export async function POST(req) {
       user_id: user.id,
       total_amount: totalAmount,
       status: "pending",
+      shipping_id: defaultShipping.id,
+      shipping_address: shipping_address,
     })
     .select("*")
     .single();
   if (orderError) {
-    return res
-      .status(500)
-      .json({ error: "Order creation failed", details: orderError });
+    return new Response(JSON.stringify({ error: orderError.message }), {
+      status: 500,
+    });
   }
 
   for (const items of orderItems) {
@@ -144,7 +151,7 @@ export async function POST(req) {
     const { error: stockError } = await supabase
       .from("products")
       .update({
-        stock_quantity: supabase.raw("stock_quantity - ?", [item.quantity]),
+        stock_quantity: parseInt(item.quantity) - item.quantity,
       })
       .eq("id", item.product_id);
 
