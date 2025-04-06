@@ -2,6 +2,8 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req) {
   const supabase = await createClient();
+
+  // check user login
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -82,12 +82,10 @@ create table "public"."orders" (
     "status" text not null default 'pending'::text,
     "total_amount" numeric(10,2) not null,
     "payment_intent_id" text,
-    "shipping_method" text,
     "tracking_number" text,
     "created_at" timestamp with time zone not null default timezone('utc'::text, now()),
     "updated_at" timestamp with time zone not null default timezone('utc'::text, now()),
-    "shipping_address" uuid,
-    "billing_address" uuid
+    "shipping_address" uuid
 );
 
 
