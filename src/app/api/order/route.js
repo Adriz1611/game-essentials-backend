@@ -146,21 +146,7 @@ export async function POST(req) {
     }
   }
 
-  // Deduct Stock
-  for (const item of cartItems) {
-    const { error: stockError } = await supabase
-      .from("products")
-      .update({
-        stock_quantity: parseInt(item.quantity) - item.quantity,
-      })
-      .eq("id", item.product_id);
 
-    if (stockError) {
-      return new Response(JSON.stringify({ error: "Stock deduction failed" }), {
-        status: 500,
-      });
-    }
-  }
 
   // Clear Cart
   const { error: clearCartError } = await supabase

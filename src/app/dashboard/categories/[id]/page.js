@@ -3,7 +3,6 @@ import { createClient } from "@/utils/supabase/server";
 export default async function EditProductPage({ params }) {
   const { id } = await params;
 
-  console.log(id);
 
   const category_id = await fetchCategoryId(id);
   const categories = await fetchCategories();
