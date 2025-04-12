@@ -4,10 +4,12 @@ import { createClient } from "@/utils/supabase/server";
 export default async function CheckoutPage({ params }) {
   const { id } = await params;
   const orderData = await fetchOrders(id);
+  const shippingMethods = await fetchShippingMethods();
+
 
   return (
     <main>
-      <TestPage data={orderData} />
+      <TestPage data={orderData} shippingMethods={shippingMethods} />
     </main>
   );
 }

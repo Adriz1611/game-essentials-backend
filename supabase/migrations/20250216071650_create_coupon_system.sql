@@ -38,7 +38,7 @@ declare
   coupon_total int;
 begin
   -- Retrieve limits for the coupon
-  select per_user_limit, total_usage_limit
+  select user_usage_limit, total_usage_limit
     into per_limit, total_limit
   from public.coupons
   where id = NEW.coupon_id;
