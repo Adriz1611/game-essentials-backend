@@ -25,12 +25,15 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function TestPage({ data, shippingMethods }) {
   const [couponCode, setCouponCode] = useState("");
   const [shippingMethod, setShippingMethod] = useState(data[0].shipping_id);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("cashfree");
+
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -69,6 +72,9 @@ export default function TestPage({ data, shippingMethods }) {
         paymentMethod: selectedPayment,
       }),
     });
+
+    const result = await res.json();
+    router.push(result.redirectUrl);
   };
 
   return (
