@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import axios from "axios";
 import crypto from "crypto";
 import { NextResponse } from "next/server";
+import { Cashfree } from "cashfree-pg";
 
 export async function POST(req) {
   try {
@@ -11,7 +12,6 @@ export async function POST(req) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    // Better auth error handling
     if (authError) {
       console.error("Auth error:", authError);
       return NextResponse.json(
@@ -123,6 +123,35 @@ export async function POST(req) {
           { status: 500 }
         );
       }
+    } else if (paymentMethod == "cashfree") {
+      Cashfree.XClientId = TEST1053325906729e357b9ade9df73595233501;
+      Cashfree.XClientSecret =
+        cfsk_ma_test_25098d514fc79227bf4531f3aaff5685_a477329e;
+      Cashfree.XEnvironment = Cashfree.Enviornment.SANDBOX;
+
+      const request = {
+        order_amount: orderData.total_amount,
+        order_currency: "INR",
+        customer_details: {
+          customer_id: orderData.customers?.id,
+          customer_name:
+            orderData.customers?.first_name ||
+            "First" + " " + orderData.customers?.last_name ||
+            "Last",
+          customer_email: orderData.customers?.email,
+          customer_phone: orderData.customers?.phone,
+        },
+        order_meta: {
+          return_url: `http://${req.headers.get("host")}/success`,
+        },
+        order_note: orderData.id,
+      };
+
+      const res = await Cashfree.PGCreateOrder("2023-08-01", request);
+      console.log("Cashfree response:", res);
+      return NextResponse.json({
+        redirectUrl: res.data,
+      });
     }
   } catch (error) {
     console.error("Error in checkout route:", error);
