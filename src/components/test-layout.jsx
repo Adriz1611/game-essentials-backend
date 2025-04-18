@@ -26,6 +26,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { load } from "@cashfreepayments/cashfree-js";
 
 export default function TestPage({ data, shippingMethods }) {
   const [couponCode, setCouponCode] = useState("");
@@ -60,6 +61,14 @@ export default function TestPage({ data, shippingMethods }) {
     }
   };
 
+  let cashfree;
+  var initializeSDK = async function () {
+    cashfree = await load({
+      mode: "sandbox",
+    });
+  };
+  initializeSDK();
+
   const handlePaymentSubmit = async () => {
     setShowPaymentModal(false);
     const res = await fetch("/api/checkout", {
@@ -74,7 +83,17 @@ export default function TestPage({ data, shippingMethods }) {
     });
 
     const result = await res.json();
-    router.push(result.redirectUrl);
+    if (selectedPayment === "cashfree") {
+      console.log(result.session_id);
+      let checkoutOptions = {
+        paymentSessionId: result.session_id,
+        redirectTarget: "_self",
+      };
+      await cashfree.checkout(checkoutOptions);
+    }
+    if (selectedPayment === "phonepe") {
+      router.push(result.redirectUrl);
+    }
   };
 
   return (

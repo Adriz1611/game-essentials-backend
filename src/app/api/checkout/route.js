@@ -31,7 +31,7 @@ export async function POST(req) {
 
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
-      .select("*, customers (*)")
+      .select("*, customers (*), shipping_address (*)")
       .eq("id", orderId)
       .single();
 
@@ -82,7 +82,8 @@ export async function POST(req) {
         redirectUrl: `http://${req.headers.get("host")}/success`,
         callbackUrl: `http://${req.headers.get("host")}/success`,
         redirectMode: "POST",
-        mobileNumber: orderData.customers?.phone || "9999999999",
+        mobileNumber:
+          orderData.customers?.phone || orderData.shipping_address?.phone,
         paymentInstrument: {
           type: "PAY_PAGE",
         },
@@ -124,11 +125,6 @@ export async function POST(req) {
         );
       }
     } else if (paymentMethod == "cashfree") {
-      Cashfree.XClientId = TEST1053325906729e357b9ade9df73595233501;
-      Cashfree.XClientSecret =
-        cfsk_ma_test_25098d514fc79227bf4531f3aaff5685_a477329e;
-      Cashfree.XEnvironment = Cashfree.Enviornment.SANDBOX;
-
       const request = {
         order_amount: orderData.total_amount,
         order_currency: "INR",
@@ -139,18 +135,34 @@ export async function POST(req) {
             "First" + " " + orderData.customers?.last_name ||
             "Last",
           customer_email: orderData.customers?.email,
-          customer_phone: orderData.customers?.phone,
+          customer_phone:
+            orderData.customers?.phone || orderData.shipping_address?.phone,
         },
         order_meta: {
           return_url: `http://${req.headers.get("host")}/success`,
+          order_id: orderData.id,
         },
         order_note: orderData.id,
       };
 
-      const res = await Cashfree.PGCreateOrder("2023-08-01", request);
-      console.log("Cashfree response:", res);
+      const options = {
+        method: "POST",
+        url: "https://sandbox.cashfree.com/pg/orders",
+        headers: {
+          "Content-Type": "application/json",
+          "x-client-id": "TEST1053325906729e357b9ade9df73595233501",
+          "x-client-secret":
+            "cfsk_ma_test_25098d514fc79227bf4531f3aaff5685_a477329e",
+          "x-api-version": "2025-01-01",
+        },
+        data: JSON.stringify(request),
+      };
+
+  
+
+      const res = await axios(options);
       return NextResponse.json({
-        redirectUrl: res.data,
+        session_id: res.data.payment_session_id,
       });
     }
   } catch (error) {
