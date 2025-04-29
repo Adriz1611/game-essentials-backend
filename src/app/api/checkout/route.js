@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import axios from "axios";
 import crypto from "crypto";
 import { NextResponse } from "next/server";
-import { Cashfree } from "cashfree-pg";
 
 export async function POST(req) {
   try {
@@ -66,7 +65,6 @@ export async function POST(req) {
       );
     }
 
-    // check if payment method is phonepe
     if (paymentMethod === "phonepe") {
       let salt_key = "96434309-7796-489d-8924-ab56988a6076";
       let merchant_id = "PGTESTPAYUAT86";
@@ -140,6 +138,8 @@ export async function POST(req) {
         },
         order_meta: {
           return_url: `http://${req.headers.get("host")}/success`,
+          notify_url:
+            "https://webhook.site/9671b80e-0541-4c86-bbe2-da0802984699",
           order_id: orderData.id,
         },
         order_note: orderData.id,
@@ -153,12 +153,10 @@ export async function POST(req) {
           "x-client-id": "TEST1053325906729e357b9ade9df73595233501",
           "x-client-secret":
             "cfsk_ma_test_25098d514fc79227bf4531f3aaff5685_a477329e",
-          "x-api-version": "2025-01-01",
+          "x-api-version": "2023-08-01",
         },
         data: JSON.stringify(request),
       };
-
-  
 
       const res = await axios(options);
       return NextResponse.json({
