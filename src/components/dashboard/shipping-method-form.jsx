@@ -40,7 +40,6 @@ const formSchema = z.object({
 });
 
 export default function ShippingMethodForm({ shipping_data }) {
-  console.log(shipping_data.name);
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
   const form = useForm({
