@@ -1,7 +1,19 @@
--- Seed data for categories, discounts, tags, products, product_tags, and coupons
+/* ======================================================================
+FULL SEED FILE — 30 PRODUCTS
+PostgreSQL 16-compatible
+----------------------------------------------------------------------
+Tables touched:
+categories · discounts · tags · products · product_tags
+coupons · shipping
+Run in a fresh database (or after TRUNCATE … CASCADE) for a clean seed.
+====================================================================== */
 
+BEGIN;
+
+/* ─────────────────────────────
+1. CATEGORIES (5 rows, 2 levels)
+───────────────────────────── */
 WITH
-    -- Categories
     elec AS (
         INSERT INTO
             public.categories (name, description)
@@ -17,7 +29,7 @@ WITH
             public.categories (name, description, parent_id)
         VALUES (
                 'Mobile Phones',
-                'Smartphones and mobile phones',
+                'Smartphones and feature phones',
                 (
                     SELECT id
                     FROM elec
@@ -31,7 +43,7 @@ WITH
             public.categories (name, description, parent_id)
         VALUES (
                 'Laptops',
-                'High-performance laptops for work and play',
+                'Portable computers for work and play',
                 (
                     SELECT id
                     FROM elec
@@ -45,7 +57,7 @@ WITH
             public.categories (name, description)
         VALUES (
                 'Clothing',
-                'Fashionable clothing items'
+                'Apparel and fashion items'
             )
         RETURNING
             id
@@ -64,8 +76,10 @@ WITH
         RETURNING
             id
     ),
--- Discounts (5 unique discounts so each product gets a unique discount)
-disc1 AS (
+/* ─────────────────────────────
+2. DISCOUNTS (5 rows)
+───────────────────────────── */
+disc_summer AS (
     INSERT INTO
         public.discounts (
             name,
@@ -77,7 +91,7 @@ disc1 AS (
         )
     VALUES (
             'Summer Sale',
-            '15% off summer sale',
+            '15 % off summer sale',
             'percentage',
             15.00,
             '2025-06-01 00:00:00+00',
@@ -86,7 +100,7 @@ disc1 AS (
     RETURNING
         id
 ),
-disc2 AS (
+disc_clearance AS (
     INSERT INTO
         public.discounts (
             name,
@@ -107,7 +121,7 @@ disc2 AS (
     RETURNING
         id
 ),
-disc3 AS (
+disc_black AS (
     INSERT INTO
         public.discounts (
             name,
@@ -119,7 +133,7 @@ disc3 AS (
         )
     VALUES (
             'Black Friday',
-            '25% off Black Friday sale',
+            '25 % off Black Friday sale',
             'percentage',
             25.00,
             '2025-11-20 00:00:00+00',
@@ -128,7 +142,7 @@ disc3 AS (
     RETURNING
         id
 ),
-disc4 AS (
+disc_newyear AS (
     INSERT INTO
         public.discounts (
             name,
@@ -149,7 +163,7 @@ disc4 AS (
     RETURNING
         id
 ),
-disc5 AS (
+disc_spring AS (
     INSERT INTO
         public.discounts (
             name,
@@ -161,7 +175,7 @@ disc5 AS (
         )
     VALUES (
             'Spring Special',
-            '10% off Spring Special',
+            '10 % off spring special',
             'percentage',
             10.00,
             '2025-03-01 00:00:00+00',
@@ -170,315 +184,454 @@ disc5 AS (
     RETURNING
         id
 ),
--- Tags (5 tags)
-tag1 AS (
+/* ─────────────────────────────
+3. TAGS (5 rows)
+───────────────────────────── */
+tag_feat AS (
     INSERT INTO
         public.tags (name, description)
     VALUES (
             'Featured',
-            'Featured products'
+            'Highlighted products of the month'
         )
     RETURNING
         id
 ),
-tag2 AS (
+tag_sale AS (
     INSERT INTO
         public.tags (name, description)
-    VALUES ('Sale', 'Products on sale')
+    VALUES (
+            'Sale',
+            'Products currently on promotion'
+        )
     RETURNING
         id
 ),
-tag3 AS (
+tag_best AS (
     INSERT INTO
         public.tags (name, description)
     VALUES (
             'Bestseller',
-            'Top selling products'
+            'Top-selling products'
         )
     RETURNING
         id
 ),
-tag4 AS (
+tag_lim AS (
     INSERT INTO
         public.tags (name, description)
     VALUES (
             'Limited Edition',
-            'Limited edition products'
+            'Limited stock products'
         )
     RETURNING
         id
 ),
-tag5 AS (
+tag_new AS (
     INSERT INTO
         public.tags (name, description)
     VALUES (
             'New Arrival',
-            'Newly arrived products'
+            'Recently added products'
         )
     RETURNING
         id
 ),
--- Products (5 products, each referencing a unique discount)
-prod1 AS (
-    INSERT INTO
-        public.products (
-            name,
-            description,
-            price,
-            stock_quantity,
-            category_id,
-            discount_id,
-            is_digital
-        )
-    VALUES (
-            'Smartphone X',
-            'Latest smartphone with cutting-edge features',
-            699.99,
-            50,
-            (
-                SELECT id
-                FROM mob
-            ),
-            (
-                SELECT id
-                FROM disc1
-            ),
-            false
-        )
-    RETURNING
-        id
+/* ─────────────────────────────
+4. PRODUCTS (30 rows)
+───────────────────────────── */
+inserted_products AS (
+    INSERT INTO public.products
+        (name, description, price, stock_quantity,
+         category_id,                      discount_id,         is_digital)
+    VALUES
+    /* Mobile Phones (6) */
+    ('Smartphone Alpha',   'Mid-range smartphone with OLED display',                 549.99,  60, (SELECT id FROM mob),   (SELECT id FROM disc_summer),    FALSE),
+    ('Smartphone Beta',    'Compact phone with long-lasting battery',                379.99,  80, (SELECT id FROM mob),   (SELECT id FROM disc_spring),    FALSE),
+    ('Smartphone Gamma',   'Flagship camera phone with AI imaging',                  929.99,  35, (SELECT id FROM mob),   (SELECT id FROM disc_black),     FALSE),
+    ('Smartphone Delta',   'Budget 5 G phone with great value',                      289.99, 120, (SELECT id FROM mob),   (SELECT id FROM disc_clearance), FALSE),
+    ('Smartphone Epsilon', 'Premium foldable phone, ultra-thin design',             1299.99,  25, (SELECT id FROM mob),   (SELECT id FROM disc_newyear),   FALSE),
+    ('Smartphone Zeta',    'Rugged smartphone built for outdoor adventures',         649.99,  50, (SELECT id FROM mob),   (SELECT id FROM disc_summer),    FALSE),
+
+/* Laptops (6) */
+(
+    'Ultrabook Slim 13',
+    '13-inch ultraportable with 18-hour battery',
+    999.99,
+    40,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_clearance
+    ),
+    FALSE
 ),
-prod2 AS (
-    INSERT INTO
-        public.products (
-            name,
-            description,
-            price,
-            stock_quantity,
-            category_id,
-            discount_id,
-            is_digital
-        )
-    VALUES (
-            'Laptop Pro',
-            'High-performance laptop designed for professionals',
-            1299.99,
-            30,
-            (
-                SELECT id
-                FROM lap
-            ),
-            (
-                SELECT id
-                FROM disc2
-            ),
-            false
-        )
-    RETURNING
-        id
+(
+    'Ultrabook Plus 15',
+    '15-inch creator laptop with discrete GPU',
+    1399.99,
+    30,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_black
+    ),
+    FALSE
 ),
-prod3 AS (
-    INSERT INTO
-        public.products (
-            name,
-            description,
-            price,
-            stock_quantity,
-            category_id,
-            discount_id,
-            is_digital
-        )
-    VALUES (
-            'Designer Jeans',
-            'Stylish and comfortable designer jeans',
-            89.99,
-            100,
-            (
-                SELECT id
-                FROM cloth
-            ),
-            (
-                SELECT id
-                FROM disc3
-            ),
-            false
-        )
-    RETURNING
-        id
+(
+    'Gaming Notebook X',
+    'RTX graphics, per-key RGB, 240 Hz display',
+    1799.99,
+    20,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_newyear
+    ),
+    FALSE
 ),
-prod4 AS (
-    INSERT INTO
-        public.products (
-            name,
-            description,
-            price,
-            stock_quantity,
-            category_id,
-            discount_id,
-            is_digital
-        )
-    VALUES (
-            'Wireless Headphones',
-            'Noise-cancelling wireless headphones with high-fidelity sound',
-            199.99,
-            75,
-            (
-                SELECT id
-                FROM elec
-            ),
-            (
-                SELECT id
-                FROM disc4
-            ),
-            false
-        )
-    RETURNING
-        id
+(
+    'Workstation Pro 17',
+    '17-inch workstation for CAD & 3-D rendering',
+    2199.99,
+    15,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_spring
+    ),
+    FALSE
 ),
-prod5 AS (
-    INSERT INTO
-        public.products (
-            name,
-            description,
-            price,
-            stock_quantity,
-            category_id,
-            discount_id,
-            is_digital
-        )
-    VALUES (
-            'Luxury Watch',
-            'Elegant luxury watch with premium craftsmanship',
-            499.99,
-            25,
-            (
-                SELECT id
-                FROM acc
-            ),
-            (
-                SELECT id
-                FROM disc5
-            ),
-            false
-        )
-    RETURNING
-        id
+(
+    'Convertible Flex 14',
+    '2-in-1 touchscreen laptop with stylus support',
+    849.99,
+    55,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_summer
+    ),
+    FALSE
+),
+(
+    'Student Laptop Basic',
+    'Affordable laptop for everyday tasks',
+    499.99,
+    100,
+    (
+        SELECT id
+        FROM lap
+    ),
+    (
+        SELECT id
+        FROM disc_clearance
+    ),
+    FALSE
+),
+/* Electronics (6) */
+(
+    'Bluetooth Speaker Boom',
+    'Portable speaker with deep bass',
+    59.99,
+    180,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_spring
+    ),
+    FALSE
+),
+(
+    'Action Camera 4 K',
+    'Water-proof 4 K action cam with stabilization',
+    199.99,
+    60,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_black
+    ),
+    FALSE
+),
+(
+    'Smart Home Hub',
+    'Voice-controlled smart-home center',
+    89.99,
+    150,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_summer
+    ),
+    FALSE
+),
+(
+    'Tablet Lite 10"',
+    '10-inch FHD tablet, 128 GB storage',
+    249.99,
+    70,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_newyear
+    ),
+    FALSE
+),
+(
+    'Noise-Cancelling Earbuds',
+    'ANC earbuds with wireless-charging case',
+    129.99,
+    140,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_clearance
+    ),
+    FALSE
+),
+(
+    'Fitness Tracker Pro',
+    'Advanced fitness tracker with ECG sensor',
+    99.99,
+    160,
+    (
+        SELECT id
+        FROM elec
+    ),
+    (
+        SELECT id
+        FROM disc_spring
+    ),
+    FALSE
+),
+/* Clothing (6) */
+(
+    'Cotton Hoodie',
+    'Soft fleece hoodie, unisex fit',
+    39.99,
+    180,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_summer
+    ),
+    FALSE
+),
+(
+    'Running Shorts',
+    'Lightweight quick-dry running shorts',
+    24.99,
+    220,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_black
+    ),
+    FALSE
+),
+(
+    'Formal Shirt',
+    'Slim-fit wrinkle-resistant formal shirt',
+    34.99,
+    140,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_newyear
+    ),
+    FALSE
+),
+(
+    'Denim Jacket',
+    'Classic denim jacket with modern cut',
+    69.99,
+    90,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_spring
+    ),
+    FALSE
+),
+(
+    'Athleisure Leggings',
+    'High-stretch leggings with phone pocket',
+    29.99,
+    200,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_clearance
+    ),
+    FALSE
+),
+(
+    'Polo T-Shirt',
+    'Breathable cotton-piqué polo',
+    27.99,
+    160,
+    (
+        SELECT id
+        FROM cloth
+    ),
+    (
+        SELECT id
+        FROM disc_summer
+    ),
+    FALSE
+),
+/* Accessories (6) */
+    
+    ('Leather Wallet',      'Genuine leather bifold wallet',                         49.99, 130, (SELECT id FROM acc),   (SELECT id FROM disc_spring),    FALSE),
+    ('Steel Bracelet',      'Stainless-steel link bracelet',                         39.99, 120, (SELECT id FROM acc),   (SELECT id FROM disc_black),     FALSE),
+    ('Sports Cap',          'Moisture-wicking adjustable sports cap',                19.99, 200, (SELECT id FROM acc),   (SELECT id FROM disc_summer),    FALSE),
+    ('Travel Backpack',     '35 L travel backpack with laptop sleeve',               89.99,  70, (SELECT id FROM acc),   (SELECT id FROM disc_newyear),   FALSE),
+    ('Wool Beanie',         'Merino-wool beanie for cold weather',                   21.99, 160, (SELECT id FROM acc),   (SELECT id FROM disc_clearance), FALSE),
+    ('Designer Belt',       'Premium leather belt with metal buckle',                59.99, 110, (SELECT id FROM acc),   (SELECT id FROM disc_black),     FALSE)
+    RETURNING id, name
 )
--- Insert product-to-tag relationships in the join table
+
+/* ─────────────────────────────
+5. PRODUCT_TAGS (≥ 30 rows)
+───────────────────────────── */
 INSERT INTO
     public.product_tags (product_id, tags_id)
-VALUES (
-        (
-            SELECT id
-            FROM prod1
-        ),
-        (
-            SELECT id
-            FROM tag1
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod1
-        ),
-        (
-            SELECT id
-            FROM tag5
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod2
-        ),
-        (
-            SELECT id
-            FROM tag3
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod2
-        ),
-        (
-            SELECT id
-            FROM tag2
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod3
-        ),
-        (
-            SELECT id
-            FROM tag2
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod3
-        ),
-        (
-            SELECT id
-            FROM tag3
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod4
-        ),
-        (
-            SELECT id
-            FROM tag1
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod4
-        ),
-        (
-            SELECT id
-            FROM tag4
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod5
-        ),
-        (
-            SELECT id
-            FROM tag5
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod5
-        ),
-        (
-            SELECT id
-            FROM tag4
-        )
-    ),
-    (
-        (
-            SELECT id
-            FROM prod5
-        ),
-        (
-            SELECT id
-            FROM tag3
-        )
-    );
+SELECT p.id, t.id
+FROM (
+        VALUES (
+                'Smartphone Alpha',
+                'New Arrival'
+            ),
+            ('Smartphone Beta', 'Sale'),
+            (
+                'Smartphone Gamma',
+                'Featured'
+            ),
+            ('Smartphone Delta', 'Sale'),
+            (
+                'Smartphone Epsilon',
+                'Limited Edition'
+            ),
+            ('Smartphone Zeta', 'Featured'),
+            (
+                'Ultrabook Slim 13',
+                'Featured'
+            ),
+            (
+                'Ultrabook Plus 15',
+                'Bestseller'
+            ),
+            (
+                'Gaming Notebook X',
+                'Limited Edition'
+            ),
+            (
+                'Workstation Pro 17',
+                'Bestseller'
+            ),
+            (
+                'Convertible Flex 14',
+                'New Arrival'
+            ),
+            (
+                'Student Laptop Basic',
+                'Sale'
+            ),
+            (
+                'Bluetooth Speaker Boom',
+                'Sale'
+            ),
+            (
+                'Action Camera 4 K',
+                'Featured'
+            ),
+            (
+                'Smart Home Hub',
+                'New Arrival'
+            ),
+            ('Tablet Lite 10"', 'Sale'),
+            (
+                'Noise-Cancelling Earbuds',
+                'Bestseller'
+            ),
+            (
+                'Fitness Tracker Pro',
+                'New Arrival'
+            ),
+            (
+                'Cotton Hoodie',
+                'New Arrival'
+            ),
+            ('Running Shorts', 'Sale'),
+            ('Formal Shirt', 'Bestseller'),
+            ('Denim Jacket', 'Featured'),
+            ('Athleisure Leggings', 'Sale'),
+            ('Polo T-Shirt', 'New Arrival'),
+            (
+                'Leather Wallet',
+                'Limited Edition'
+            ),
+            (
+                'Steel Bracelet',
+                'Bestseller'
+            ),
+            ('Sports Cap', 'Sale'),
+            ('Travel Backpack', 'Featured'),
+            ('Wool Beanie', 'Sale'),
+            ('Designer Belt', 'Bestseller')
+    ) AS m (prod_name, tag_name)
+    JOIN inserted_products p ON p.name = m.prod_name
+    JOIN public.tags t ON t.name = m.tag_name;
 
--- Insert 5 coupon records
+/* ─────────────────────────────
+6. COUPONS (5 rows)
+───────────────────────────── */
 INSERT INTO
     public.coupons (
         code,
@@ -535,6 +688,9 @@ VALUES (
         200
     );
 
+/* ─────────────────────────────
+7. SHIPPING OPTIONS (2 rows)
+───────────────────────────── */
 INSERT INTO
     public.shipping (
         name,
@@ -542,5 +698,8 @@ INSERT INTO
         estimated_delivery_days,
         is_active
     )
-VALUES ('Standard', 0, 5, true),
-    ('Express', 199, 2, false);
+VALUES ('Standard', 0, 5, TRUE),
+    ('Express', 199, 2, FALSE);
+
+/* All done */
+COMMIT;
