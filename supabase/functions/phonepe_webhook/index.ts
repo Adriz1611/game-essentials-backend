@@ -13,7 +13,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
 );
 
-// Your PhonePe secret & key index, set in your project’s Env
+
 const SALT_KEY   = Deno.env.get("PHONEPE_SALT_KEY");
 const SALT_INDEX = Deno.env.get("PHONEPE_SALT_INDEX");
 
