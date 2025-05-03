@@ -3,16 +3,17 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 console.log("🚀 Cashfree webhook function loaded");
 
+  const supabase = createClient(
+      Deno.env.get("API_URL")!,
+      Deno.env.get("SERVICE_ROLE_KEY")!
+  );
 Deno.serve(async (req) => {
 
   // if(req.method !== "POST") {
   //   return new Response("Method Not Allowed", { status: 405 })
   // }
 
-  const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
+
 
   const body = await req.json()
   
@@ -21,9 +22,13 @@ Deno.serve(async (req) => {
   }
 
     const { data } = body;
+
+    
     const orderId: string = data.order.order_id;
     const paymentStatus: string = data.payment.payment_status;       // e.g. "SUCCESS"
     const cfPaymentId: string = data.payment.cf_payment_id;          // Cashfree payment ID
+
+    console.log("Received webhook data:", orderId, paymentStatus, cfPaymentId);
 
     const newOrderStatus = paymentStatus === "SUCCESS" ? "paid" : "failed";
 
@@ -34,6 +39,8 @@ Deno.serve(async (req) => {
         payment_intent_id: cfPaymentId,
       })
       .eq("id", orderId);
+
+      console.log("UError", updateErr);
 
     if (updateErr) {
       console.error("Failed to update order:", updateErr);
