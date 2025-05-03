@@ -4,8 +4,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 console.log("🚀 Cashfree webhook function loaded");
 
 const supabase = createClient(
-  Deno.env.get("API_URL")!,
-  Deno.env.get("SERVICE_ROLE_KEY")!
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
 const CASHFREE_SECRET = Deno.env.get("CASHFREE_WEBHOOK_SECRET")!;
