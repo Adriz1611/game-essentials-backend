@@ -29,7 +29,9 @@ export function StatusUpdateModal({ isOpen, onClose, order, onStatusUpdate }) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Update Order Status</DialogTitle>
-          <DialogDescription>Change the status for order #{order.id}</DialogDescription>
+          <DialogDescription>
+            Change the status for order #{order.id}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <RadioGroup value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -38,43 +40,34 @@ export function StatusUpdateModal({ isOpen, onClose, order, onStatusUpdate }) {
               <Label htmlFor="pending">Pending</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Paid" id="paid" />
+              <RadioGroupItem value="paid" id="paid" />
               <Label htmlFor="paid">Paid</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Processing" id="processing" />
+              <RadioGroupItem value="processing" id="processing" />
               <Label htmlFor="processing">Processing</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Shipped" id="shipped" />
+              <RadioGroupItem value="shipped" id="shipped" />
               <Label htmlFor="shipped">Shipped</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Out for Delivery" id="out-for-delivery" />
+              <RadioGroupItem value="out-for-delivery" id="out-for-delivery" />
               <Label htmlFor="out-for-delivery">Out for Delivery</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Delivered" id="delivered" />
+              <RadioGroupItem value="delivered" id="delivered" />
               <Label htmlFor="delivered">Delivered</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Canceled" id="canceled" />
+              <RadioGroupItem value="canceled" id="canceled" />
               <Label htmlFor="canceled">Canceled</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Refunded" id="refunded" />
+              <RadioGroupItem value="refunded" id="refunded" />
               <Label htmlFor="refunded">Refunded</Label>
             </div>
           </RadioGroup>
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (optional)</Label>
-            <Textarea
-              id="notes"
-              placeholder="Add any notes about this status change"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
@@ -84,5 +77,5 @@ export function StatusUpdateModal({ isOpen, onClose, order, onStatusUpdate }) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

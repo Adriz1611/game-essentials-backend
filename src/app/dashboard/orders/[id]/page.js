@@ -3,9 +3,8 @@ import { createClient } from "@/utils/supabase/server";
 
 export default async function OrdersList({ params }) {
   const { id } = await params;
-
   const data = await fetchOrders(id);
-  console.log("Orders data:", data[0]);
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-1">

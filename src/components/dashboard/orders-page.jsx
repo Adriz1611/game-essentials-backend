@@ -37,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateOrderStatus } from "@/app/actions/order-action";
 
 export default function OrdersPage({ ordersData }) {
   const router = useRouter();
@@ -107,27 +108,23 @@ export default function OrdersPage({ ordersData }) {
     }).format(amount);
   };
 
-const truncateAddress = (address) => {
-    const {
-        street_address1,
-        street_address2,
-        state_province,
-        postal_code,
-    } = address;
+  const truncateAddress = (address) => {
+    const { street_address1, street_address2, state_province, postal_code } =
+      address;
 
     const fullAddress = [
-        street_address1,
-        street_address2,
-        state_province,
-        postal_code,
+      street_address1,
+      street_address2,
+      state_province,
+      postal_code,
     ]
-        .filter(Boolean)
-        .join(", ");
+      .filter(Boolean)
+      .join(", ");
 
     return fullAddress.length > 30
-        ? `${fullAddress.substring(0, 30)}...`
-        : fullAddress;
-};
+      ? `${fullAddress.substring(0, 30)}...`
+      : fullAddress;
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -277,8 +274,14 @@ const truncateAddress = (address) => {
           isOpen={isStatusModalOpen}
           onClose={() => setIsStatusModalOpen(false)}
           order={selectedOrder}
-          onStatusUpdate={(newStatus) => {
+          onStatusUpdate={async (newStatus) => {
             // In a real application, this would update the order status via an API call
+            const res = await updateOrderStatus(selectedOrder.id, newStatus);
+            if (res?.error) {
+              alert("Error updating order status");
+              return;
+            }
+
             alert(`Order #${selectedOrder.id} status updated to ${newStatus}`);
             setIsStatusModalOpen(false);
           }}

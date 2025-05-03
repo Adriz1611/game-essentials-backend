@@ -22,6 +22,7 @@ import {
 import { ArrowLeft, Download, RefreshCw } from "lucide-react";
 import { StatusUpdateModal } from "@/components/dashboard/status-update-modal";
 import { useState } from "react";
+import { updateOrderStatus } from "@/app/actions/order-action";
 
 export default function OrderDetailsPage({ order }) {
   const router = useRouter();
@@ -95,7 +96,6 @@ export default function OrderDetailsPage({ order }) {
     0
   );
 
-
   return (
     <div className="container mx-auto py-10">
       <div className="flex flex-col space-y-6">
@@ -103,7 +103,7 @@ export default function OrderDetailsPage({ order }) {
           <div>
             <Button
               variant="outline"
-              onClick={() => router.push("/admin/orders")}
+              onClick={() => router.push("/dashboard/orders")}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Orders
@@ -278,8 +278,13 @@ export default function OrderDetailsPage({ order }) {
         isOpen={isStatusModalOpen}
         onClose={() => setIsStatusModalOpen(false)}
         order={order}
-        onStatusUpdate={(newStatus) => {
-          // In a real application, this would update the order status via an API call
+        onStatusUpdate={async (newStatus) => {
+          const res = await updateOrderStatus(order.id, newStatus);
+          if (res.error) {
+            alert("Error updating order status");
+            return;
+          }
+
           alert(`Order #${order.id} status updated to ${newStatus}`);
           setIsStatusModalOpen(false);
         }}
