@@ -77,14 +77,14 @@ export default function OrdersPage({ ordersData }) {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      Pending: { variant: "outline", label: "Pending" },
-      Paid: { variant: "secondary", label: "Paid" },
-      Processing: { variant: "default", label: "Processing" },
-      Shipped: { variant: "secondary", label: "Shipped" },
-      "Out for Delivery": { variant: "secondary", label: "Out for Delivery" },
-      Delivered: { variant: "success", label: "Delivered" },
-      Canceled: { variant: "destructive", label: "Canceled" },
-      Refunded: { variant: "destructive", label: "Refunded" },
+      pending: { variant: "outline", label: "Pending" },
+      paid: { variant: "secondary", label: "Paid" },
+      processing: { variant: "default", label: "processing" },
+      shipped: { variant: "secondary", label: "Shipped" },
+      "out-for-delivery": { variant: "secondary", label: "Out for Delivery" },
+      delivered: { variant: "success", label: "Delivered" },
+      canceled: { variant: "destructive", label: "Canceled" },
+      refunded: { variant: "destructive", label: "Refunded" },
     };
 
     const style = statusStyles[status] || { variant: "outline", label: status };
@@ -154,16 +154,16 @@ export default function OrdersPage({ ordersData }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="Pending">Pending</SelectItem>
-                  <SelectItem value="Paid">Paid</SelectItem>
-                  <SelectItem value="Processing">Processing</SelectItem>
-                  <SelectItem value="Shipped">Shipped</SelectItem>
-                  <SelectItem value="Out for Delivery">
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="processing">Processing</SelectItem>
+                  <SelectItem value="shipped">Shipped</SelectItem>
+                  <SelectItem value="out-for-delivery">
                     Out for Delivery
                   </SelectItem>
-                  <SelectItem value="Delivered">Delivered</SelectItem>
-                  <SelectItem value="Canceled">Canceled</SelectItem>
-                  <SelectItem value="Refunded">Refunded</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="canceled">Canceled</SelectItem>
+                  <SelectItem value="refunded">Refunded</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -206,7 +206,9 @@ export default function OrdersPage({ ordersData }) {
                 ) : (
                   filteredOrders.map((order) => (
                     <TableRow key={order.id}>
-                      <TableCell className="font-medium">#{order.id}</TableCell>
+                      <TableCell className="font-medium">
+                        #{order.id.substring(0, 8).toUpperCase()}
+                      </TableCell>
                       <TableCell>
                         {order.user_id.first_name +
                           " " +
