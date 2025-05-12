@@ -50,7 +50,7 @@ export default function OrdersPage({ ordersData }) {
   const filteredOrders = ordersData.filter((order) => {
     const matchesSearch =
       order.user_id.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.payment_intent_id
+      order.id
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
       order.id.toString().includes(searchQuery);
