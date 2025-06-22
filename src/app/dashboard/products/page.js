@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server";
 
 export default async function ProductsPage() {
   const data = await fetchProducts();
+  const tagsData = await fetchTags();
+  const productTags = await fetchProductTags();
   return (
     <div className="w-full">
       <div className="w-full flex flex-row justify-between">
@@ -13,7 +15,7 @@ export default async function ProductsPage() {
           <Button>Add Product</Button>
         </Link>
       </div>
-      <ProductList data={data} />
+      <ProductList data={data} tagsData={tagsData} productTags={productTags} />
     </div>
   );
 }
@@ -30,4 +32,27 @@ async function fetchProducts() {
   }
 
   return products;
+}
+
+async function fetchTags() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("tags").select("*");
+  if (error) {
+    console.error("Error fetching tags:", error);
+    return [];
+  }
+
+  return data;
+}
+
+async function fetchProductTags() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("product_tags")
+    .select("product_id, tags_id");
+  if (error) {
+    console.error("Error fetching product-tags:", error);
+    return [];
+  }
+  return data;
 }
