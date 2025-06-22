@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -30,10 +30,12 @@ import {
 import Link from "next/link";
 import { getStatusColors } from "@/utils";
 import { cn } from "@/lib/utils";
+import { deleteTag } from "@/app/actions/product-action";
 
 export default function TagList({ tags_data }) {
   const [tags, setTags] = useState(tags_data);
   const [sortConfig, setSortConfig] = useState(null);
+  const [isPending, startTransition] = useTransition();
 
   const sortTags = (key) => {
     let direction = "asc";
@@ -59,9 +61,17 @@ export default function TagList({ tags_data }) {
     );
   };
 
+  const handleDelete = (id) => {
+    startTransition(async () => {
+      const result = await deleteTag(id);
+      if (result.success) {
+        setTags((prev) => prev.filter((t) => t.id !== id));
+      }
+    });
+  };
+
   return (
     <div>
-      
       <Table>
         <TableHeader>
           <TableRow>
@@ -123,7 +133,10 @@ export default function TagList({ tags_data }) {
                         <Pencil /> Edit
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem className="cursor-pointer ">
+                    <DropdownMenuItem
+                      className="cursor-pointer "
+                      onClick={() => handleDelete(tag.id)}
+                    >
                       <Trash /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

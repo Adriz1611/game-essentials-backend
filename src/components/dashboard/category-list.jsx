@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -20,10 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Copy } from "lucide-react";
 import Link from "next/link";
+import { deleteCategory } from "@/app/actions/product-action";
 
 export default function CategoryList({ data }) {
   const [categories, setCategories] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const sortCategories = (key) => {
     let direction = "asc";
@@ -47,6 +51,21 @@ export default function CategoryList({ data }) {
         return 0;
       })
     );
+  };
+
+  const handleDelete = (id) => {
+    startTransition(async () => {
+      const result = await deleteCategory(id);
+      if (result.success) {
+        setCategories((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        toast({
+          title: "Cannot delete category",
+          description:
+            "This category is linked to other records. Please remove child categories or products first.",
+        });
+      }
+    });
   };
 
   const getParentCategoryName = (parentId) => {
@@ -93,7 +112,9 @@ export default function CategoryList({ data }) {
                       onClick={() =>
                         navigator.clipboard.writeText(category.id.toString())
                       }
-                    > <Copy />
+                    >
+                      {" "}
+                      <Copy />
                       Copy category ID
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -104,7 +125,10 @@ export default function CategoryList({ data }) {
                         <Pencil /> Edit
                       </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => handleDelete(category.id)}
+                    >
                       <Trash /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>

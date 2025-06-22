@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -20,12 +20,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Copy } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { deleteProduct } from "@/app/actions/product-action";
 
 export default function ProductList({ data }) {
   const [products, setProducts] = useState(data);
   const [sortConfig, setSortConfig] = useState(null);
+  const [isPending, startTransition] = useTransition();
 
   const sortProducts = (key) => {
     let direction = "asc";
@@ -51,7 +52,15 @@ export default function ProductList({ data }) {
     );
   };
 
-  const router = useRouter();
+  const handleDelete = (id) => {
+    startTransition(async () => {
+      const result = await deleteProduct(id);
+      if (result.success) {
+        setProducts((prev) => prev.filter((p) => p.id !== id));
+      }
+    });
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -126,7 +135,10 @@ export default function ProductList({ data }) {
                       <Pencil /> Edit
                     </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(product.id)}
+                  >
                     <Trash /> Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>

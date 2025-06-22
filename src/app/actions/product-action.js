@@ -201,6 +201,22 @@ export const updateTag = async (formData, id) => {
   };
 };
 
+export const deleteTag = async (id) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("tags").delete().eq("id", id);
+
+  if (error) {
+    return {
+      error: { message: "Database error: " + error.message },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/tags");
+
+  return { data, success: true };
+};
+
 export const addProductToTag = async (formData) => {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -505,4 +521,41 @@ export const updateShippingMethod = async (formData, id) => {
     data,
     success: true,
   };
+};
+
+export const deleteProduct = async (id) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("products").delete().eq("id", id);
+
+  if (error) {
+    return {
+      error: { message: "Database error: " + error.message },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/products");
+
+  return {
+    data,
+    success: true,
+  };
+};
+
+export const deleteCategory = async (id) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("categories")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    return {
+      error: { message: "Database error: " + error.message },
+      success: false,
+    };
+  }
+
+  revalidatePath("/dashboard/categories");
+  return { data, success: true };
 };
