@@ -71,6 +71,7 @@ const formSchema = z.object({
   ),
   isActive: z.boolean(),
   isDigital: z.boolean(),
+  codEnabled: z.boolean(),
 });
 
 export default function ProductForm({ product_data, categories_data }) {
@@ -92,6 +93,7 @@ export default function ProductForm({ product_data, categories_data }) {
       specifications: product_data?.specifications || [{ key: "", value: "" }],
       isActive: product_data?.is_active ?? true,
       isDigital: product_data?.is_digital ?? false,
+      codEnabled: product_data?.cod_enabled ?? false,
     },
   });
 
@@ -368,6 +370,29 @@ export default function ProductForm({ product_data, categories_data }) {
                       </FormLabel>
                       <FormDescription>
                         Is this a digital product?
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="codEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Cash on Delivery
+                      </FormLabel>
+                      <FormDescription>
+                        Enable cash on delivery for this product
                       </FormDescription>
                     </div>
                     <FormControl>
