@@ -10,6 +10,19 @@ Run in a fresh database (or after TRUNCATE … CASCADE) for a clean seed.
 
 BEGIN;
 
+-- Seed an admin user
+INSERT INTO auth.users (id, aud, role, email, encrypted_password, email_confirmed_at, created_at, raw_user_meta_data)
+VALUES (
+  gen_random_uuid(),
+  'authenticated',
+  'admin',
+  'admin@mail.com',
+  crypt('1234', gen_salt('bf', 8)),
+  now(),
+  now(),
+  '{"role":"seller"}'
+);
+
 /* ─────────────────────────────
 1. CATEGORIES (5 rows, 2 levels)
 ───────────────────────────── */
