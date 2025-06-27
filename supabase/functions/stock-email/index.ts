@@ -14,6 +14,12 @@ const supabase = createClient(
 const RESEND_API_KEY    = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 
+// Ensure email env vars are provided
+if (!RESEND_API_KEY || !RESEND_FROM_EMAIL) {
+  console.error("⚠️ Missing RESEND_API_KEY or RESEND_FROM_EMAIL environment variable");
+  throw new Error("Missing email configuration");
+}
+
 async function sendEmail(to, subject, text) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -28,7 +34,10 @@ async function sendEmail(to, subject, text) {
       text,
     }),
   });
-  if (!res.ok) throw new Error(await res.text());
+  const responseText = await res.text();
+  console.log(`Resend API response for ${to}: status=${res.status}, body=${responseText}`);
+  if (!res.ok) throw new Error(responseText);
+  return responseText;
 }
 
 
@@ -39,56 +48,70 @@ Deno.serve(async (req) => {
 if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const { record: NEW, old_record: OLD } = await req.json();
+  console.log('stock-email payload - NEW:', NEW, 'OLD:', OLD);
   const THRESHOLD = 10;
-  const wentLow   = NEW.stock_quantity <= THRESHOLD && OLD.stock_quantity  > THRESHOLD;
+  const fellBelow = NEW.stock_quantity < THRESHOLD && OLD.stock_quantity >= THRESHOLD;
   const cameBack  = NEW.stock_quantity  > THRESHOLD && OLD.stock_quantity <= THRESHOLD;
-  if (!wentLow && !cameBack) return new Response("No threshold crossing", { status: 200 });
-
-  // Fetch product + seller
-  const { data: prod } = await supabase.from("products")
-    .select("name,seller_id").eq("id", NEW.id).single();
-  if (prod) {
-    const { name, seller_id } = prod;
-    const subject = wentLow
-      ? `⚠️ Low stock: ${name}`
-      : `✅ Restocked: ${name}`;
-    const body = wentLow
-      ? `"${name}" is low: only ${NEW.stock_quantity} left.`
-      : `"${name}" is back: ${NEW.stock_quantity} available.`;
-
-    // Email seller
-    const { data: seller } = await supabase.from("customers")
-      .select("email,first_name")
-      .eq("id", seller_id).single();
-    if (seller) {
-      await sendEmail(
-        seller.email,
-        subject,
-        `Hi ${seller.first_name||''},\n\n${body}\n\n– Team`
-      );
-    }
+  console.log('Threshold check', { fellBelow, cameBack, THRESHOLD, newQty: NEW.stock_quantity, oldQty: OLD.stock_quantity });
+  if (!fellBelow && !cameBack) {
+    console.log('No threshold crossing, exiting');
+    return new Response("No threshold crossing", { status: 200 });
   }
 
-  // Fetch & email subscribers
-  // Only email subscribers when item comes back in stock
-  if (cameBack) {
-    const { data: subs } = await supabase.from("product_subscriptions")
-      .select("user_id").eq("product_id", NEW.id);
-    for (const { user_id } of subs || []) {
-      const { data: cust } = await supabase.from("customers")
-        .select("email,first_name").eq("id", user_id).single();
-      if (cust) {
-        const subject = `✅ Back in stock: ${prod.name}`;
-        const body = `"${prod.name}" is available again (${NEW.stock_quantity} in stock).`;
+  console.log('Event:', fellBelow ? 'fellBelow' : cameBack ? 'cameBack' : 'none');
+
+  // Fetch product + seller
+  console.log('Querying product for id:', NEW.id);
+  const { data: prod, error: prodError } = await supabase.from("products")
+    .select("name").eq("id", NEW.id).single();
+  console.log('Product query result:', { prod, prodError });
+  if (prod) {
+    const { name } = prod;
+    if (fellBelow) {
+      console.log('Low stock event, notifying all sellers');
+      // Notify all sellers of low stock
+      const subject = `⚠️ Low stock: ${name}`;
+      const body = `"${name}" stock low: only ${NEW.stock_quantity} left.`;
+      const { data: sellers, error: sellersError } = await supabase.from("sellers")
+        .select("email, first_name");
+      console.log('Sellers query result:', { sellers, sellersError });
+      for (const { email, first_name } of sellers || []) {
+        console.log('Sending low-stock email to seller:', email);
         await sendEmail(
-          cust.email,
+          email,
           subject,
-          `Hi ${cust.first_name || ''},\n\n${body}\n\n– Team`
+          `Hi ${first_name||''},\n\n${body}\n\n– Team`
         );
+      }
+    } else if (cameBack) {
+      console.log('Restock event, fetching subscribers');
+      // Notify subscribed customers of restock
+      const subject = `✅ Back in stock: ${name}`;
+      const body = `"${name}" is available again: ${NEW.stock_quantity} in stock.`;
+      const { data: subs, error: subsError } = await supabase.from("product_subscriptions")
+        .select("user_id").eq("product_id", NEW.id);
+      console.log('Subscribers query result:', { subs, subsError });
+      for (const { user_id } of subs || []) {
+        console.log('Notifying subscriber user_id:', user_id);
+        const { data: cust, error: custError } = await supabase.from("customers")
+          .select("email,first_name").eq("id", user_id).single();
+        console.log('Subscriber customer query result:', { cust, custError });
+        if (cust) {
+          console.log('Sending restock email to customer:', cust.email);
+          await sendEmail(
+            cust.email,
+            subject,
+            `Hi ${cust.first_name||''},\n\n${body}\n\n– Team`
+          );
+        }
       }
     }
   }
+  else {
+    console.log('No product found, skipping notifications');
+  }
 
+  console.log('Completed notification flow');
   return new Response("Emails dispatched", { status: 200 });
 
 })
