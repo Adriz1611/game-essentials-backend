@@ -110,8 +110,7 @@ create table "public"."products" (
     "is_active" boolean default true,
     "created_at" timestamp with time zone not null default timezone('utc'::text, now()),
     "updated_at" timestamp with time zone not null default timezone('utc'::text, now()),
-    "discount_id" uuid,
-    "cod_enabled" boolean not null default true
+    "discount_id" uuid
 );
 
 
