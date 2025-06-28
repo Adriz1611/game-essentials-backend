@@ -13,7 +13,7 @@ Deno.serve(async (req)=>{
   }
   const { record: NEW, old_record: OLD } = await req.json();
   // Only run when status flips to 'paid'
-  if (!(NEW.status === "paid" && OLD.status !== "paid")) {
+  if (!(NEW.status === "delivered" && OLD.status !== "delivered")) {
     return new Response("No-op", {
       status: 200
     });
